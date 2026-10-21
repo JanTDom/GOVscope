@@ -5,6 +5,10 @@ import AlertyPage from '../app/alerty/page';
 import EuropaPage from '../app/europa/page';
 import MeldunekPage from '../app/meldunek/page';
 import AudytorPage from '../app/audytor/page';
+import PremierPulpitPage from '../app/premier/page';
+import SzefKprmPage from '../app/szef-kprm/page';
+import RzecznikPage from '../app/rzecznik/page';
+import KoalicjaPage from '../app/koalicja/page';
 import { Header } from '../components/Header';
 import { POST as authLoginPost } from '../app/api/auth/login/route';
 import { NextRequest } from 'next/server';
@@ -16,6 +20,10 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
     expect(screen.getByText('Wymiar europejski')).toBeDefined();
     expect(screen.getByText('Audytor AI Gemini')).toBeDefined();
     expect(screen.getByText('Meldunek dobowy')).toBeDefined();
+    expect(screen.getByText('Pulpit premiera')).toBeDefined();
+    expect(screen.getByText('Szef KPRM')).toBeDefined();
+    expect(screen.getByText('Rzecznik (CIR)')).toBeDefined();
+    expect(screen.getByText('Komitet koalicji')).toBeDefined();
   });
 
   it('renders AlertyPage with operational title', () => {
@@ -44,6 +52,32 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
     expect(screen.getAllByText(/Audytor Spójności Rządowej AI/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Silnik Google Gemini 2.5 Flash/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Uruchom natychmiastowy audyt spójności/).length).toBeGreaterThan(0);
+  });
+
+  it('renders PremierPulpitPage with briefing and journalist ripostes', () => {
+    render(<PremierPulpitPage />);
+    expect(screen.getAllByText(/Pulpit Prezesa Rady Ministrów/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Donald Tusk/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/3 pytania, które na 100% padną dzisiaj od dziennikarzy/).length).toBeGreaterThan(0);
+  });
+
+  it('renders SzefKprmPage with SKRM legislative gate', () => {
+    render(<SzefKprmPage />);
+    expect(screen.getAllByText(/Pulpit Szefa KPRM i Przewodniczącego SKRM/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Jan Grabiec/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Maciej Berek/).length).toBeGreaterThan(0);
+  });
+
+  it('renders RzecznikPage with CIR media directives', () => {
+    render(<RzecznikPage />);
+    expect(screen.getAllByText(/Pulpit Rzecznika Prasowego Rządu i CIR/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Centrum Informacyjne Rządu/).length).toBeGreaterThan(0);
+  });
+
+  it('renders KoalicjaPage with Sejm majority bar and friction matrix', () => {
+    render(<KoalicjaPage />);
+    expect(screen.getAllByText(/Pulpit Komitetu Politycznego Koalicji/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/248 \/ 460 posłów/).length).toBeGreaterThan(0);
   });
 
   it('authenticates with password PDT2026 and rejects unauthorized passwords', async () => {

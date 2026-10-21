@@ -9,7 +9,16 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const navLinks = [
+  // Executive Core Pulpits (Rzeczywiste stanowiska i organy KPRM)
+  const executiveLinks = [
+    { href: '/premier', label: 'Pulpit premiera' },
+    { href: '/szef-kprm', label: 'Szef KPRM' },
+    { href: '/rzecznik', label: 'Rzecznik (CIR)' },
+    { href: '/koalicja', label: 'Komitet koalicji' },
+  ];
+
+  // Radar & Intelligence Modules
+  const systemLinks = [
     { href: '/', label: 'Radar KPRM' },
     { href: '/alerty', label: 'Centrum alertów' },
     { href: '/resorty', label: 'Przegląd resortów' },
@@ -37,8 +46,8 @@ export const Header: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo & Identity */}
-          <div className="flex items-center space-x-6">
-            <Link href="/" className="flex items-center space-x-3.5 group py-1">
+          <div className="flex items-center space-x-5">
+            <Link href="/" className="flex items-center space-x-3 group py-1">
               <div className="relative py-1 px-1 rounded-xl bg-slate-900/60 border border-slate-800/60 transition-all group-hover:border-slate-700">
                 <Image
                   src="/govscope-logo-dark.png"
@@ -49,7 +58,7 @@ export const Header: React.FC = () => {
                   priority
                 />
               </div>
-              <div className="hidden xl:flex flex-col">
+              <div className="hidden 2xl:flex flex-col">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-semibold leading-tight">
                   Kancelaria Prezesa Rady Ministrów
                 </span>
@@ -61,22 +70,45 @@ export const Header: React.FC = () => {
 
             {/* Navigation links */}
             <nav className="flex items-center space-x-1 overflow-x-auto py-1 scrollbar-none">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-slate-800 text-white shadow-sm shadow-slate-900 border border-slate-700/80 font-semibold'
-                        : 'text-slate-300 hover:bg-slate-900/90 hover:text-white border border-transparent'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+              {/* Executive Tier */}
+              <div className="flex items-center space-x-1 pr-1.5 border-r border-slate-800/90">
+                {executiveLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-mono transition-all ${
+                        isActive
+                          ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                          : 'text-amber-300 hover:bg-slate-900 hover:text-amber-200 border border-amber-500/30'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* System Tier */}
+              <div className="flex items-center space-x-1 pl-1.5">
+                {systemLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-slate-800 text-white shadow-sm border border-slate-700/80 font-semibold'
+                          : 'text-slate-300 hover:bg-slate-900/90 hover:text-white border border-transparent'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
             </nav>
           </div>
 
@@ -84,11 +116,7 @@ export const Header: React.FC = () => {
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-mono">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-slate-300">Nasłuch 24/7</span>
-            </div>
-
-            <div className="hidden 2xl:block text-[11px] font-mono text-slate-400 border-l border-slate-800 pl-3">
-              Pion KPRM & Minister ds. UE
+              <span className="text-slate-300">KPRM 24/7</span>
             </div>
 
             <button
