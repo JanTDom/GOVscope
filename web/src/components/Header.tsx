@@ -9,6 +9,7 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { href: '/', label: 'Radar KPRM' },
+    { href: '/alerty', label: 'Centrum alertów' },
     { href: '/resorty', label: 'Przegląd resortów' },
     { href: '/rozdzieki', label: 'Detektor rozdźwięków' },
     { href: '/europa', label: 'Wymiar europejski' },
