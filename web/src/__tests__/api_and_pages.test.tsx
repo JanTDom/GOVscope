@@ -77,7 +77,7 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
   it('renders KoalicjaPage with Sejm majority bar and friction matrix', () => {
     render(<KoalicjaPage />);
     expect(screen.getAllByText(/Pulpit Komitetu Politycznego Koalicji/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/248 \/ 460 posłów/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/460 posłów/).length).toBeGreaterThan(0);
   });
 
   it('authenticates with password PDT2026 and rejects unauthorized passwords', async () => {

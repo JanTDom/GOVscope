@@ -107,7 +107,30 @@ const COALITION_FRICTIONS: FrictionAxis[] = [
 export default function KoalicjaPage() {
   const [selectedAxisId, setSelectedAxisId] = useState<string>(COALITION_FRICTIONS[0].id);
 
+  // Sejm Discipline Simulator State
+  const [koActive, setKoActive] = useState(true);
+  const [pl2050Active, setPl2050Active] = useState(true);
+  const [pslActive, setPslActive] = useState(true);
+  const [lewicaActive, setLewicaActive] = useState(true);
+
+  const koVotes = koActive ? 157 : 0;
+  const pl2050Votes = pl2050Active ? 32 : 0;
+  const pslVotes = pslActive ? 32 : 0;
+  const lewicaVotes = lewicaActive ? 26 : 0;
+
+  const currentCoalitionVotes = koVotes + pl2050Votes + pslVotes + lewicaVotes;
+  const requiredMajority = 231;
+  const hasMajority = currentCoalitionVotes >= requiredMajority;
+  const voteMargin = currentCoalitionVotes - requiredMajority;
+
   const activeAxis = COALITION_FRICTIONS.find((a) => a.id === selectedAxisId) || COALITION_FRICTIONS[0];
+
+  const resetSimulator = () => {
+    setKoActive(true);
+    setPl2050Active(true);
+    setPslActive(true);
+    setLewicaActive(true);
+  };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -136,74 +159,188 @@ export default function KoalicjaPage() {
         </div>
       </div>
 
-      {/* Parliamentary Majority Bar (248 votes out of 460) */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 space-y-4 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-base font-bold text-white font-mono uppercase tracking-wide">
-              Struktura większości sejmowej koalicji rządowej
+      {/* SEJM MAJORITY BAR & INTERACTIVE SIMULATOR */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 sm:p-8 space-y-6 shadow-2xl relative">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              Kalkulator i symulator dyscypliny sejmowej
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-white mt-0.5 font-mono">
+              Większość rządowa w Sejmie: {currentCoalitionVotes} / 460 posłów
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono font-bold">
-              248 / 460 posłów
-            </span>
           </div>
-          <div className="text-xs font-mono text-slate-400">
-            Wymagana większość: <strong className="text-white">231 posłów</strong> • Margines: <strong className="text-emerald-400">+17 posłów</strong>
+
+          <div className="flex items-center space-x-3">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-mono font-bold border transition-all ${
+                hasMajority
+                  ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
+                  : 'bg-rose-950 text-rose-300 border-rose-800 animate-pulse'
+              }`}
+            >
+              {hasMajority
+                ? `BEZPIECZNA WIĘKSZOŚĆ (+${voteMargin} głosów)`
+                : `USTAWA ODRZUCONA (brak ${Math.abs(voteMargin)} głosów do 231)`}
+            </span>
+
+            <button
+              onClick={resetSimulator}
+              className="text-xs font-mono px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-colors"
+            >
+              Resetuj
+            </button>
           </div>
         </div>
 
         {/* Visual Sejm Majority Representation */}
         <div className="space-y-2">
-          <div className="w-full h-8 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex">
+          <div className="w-full h-9 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex relative">
+            {/* 231 majority threshold line */}
+            <div
+              style={{ left: `${(231 / 460) * 100}%` }}
+              className="absolute top-0 bottom-0 w-1 bg-white/90 z-20 shadow-md shadow-black"
+              title="Próg większości bezwzględnej: 231 posłów"
+            />
+
             {/* KO */}
-            <div
-              style={{ width: `${(157 / 460) * 100}%` }}
-              className="bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center text-[11px] font-mono text-white font-bold"
-              title="Koalicja Obywatelska: 157 posłów"
-            >
-              KO (157)
-            </div>
+            {koActive && (
+              <div
+                style={{ width: `${(157 / 460) * 100}%` }}
+                className="bg-orange-600 flex items-center justify-center text-[11px] font-mono text-white font-bold transition-all"
+                title="Koalicja Obywatelska: 157 posłów"
+              >
+                KO (157)
+              </div>
+            )}
             {/* Polska 2050 */}
-            <div
-              style={{ width: `${(32 / 460) * 100}%` }}
-              className="bg-yellow-500 hover:bg-yellow-400 transition-colors flex items-center justify-center text-[11px] font-mono text-slate-950 font-bold"
-              title="Polska 2050: 32 posłów"
-            >
-              PL2050 (32)
-            </div>
+            {pl2050Active && (
+              <div
+                style={{ width: `${(32 / 460) * 100}%` }}
+                className="bg-yellow-500 flex items-center justify-center text-[11px] font-mono text-slate-950 font-bold transition-all"
+                title="Polska 2050: 32 posłów"
+              >
+                PL2050 (32)
+              </div>
+            )}
             {/* PSL */}
-            <div
-              style={{ width: `${(32 / 460) * 100}%` }}
-              className="bg-emerald-600 hover:bg-emerald-500 transition-colors flex items-center justify-center text-[11px] font-mono text-white font-bold"
-              title="Polskie Stronnictwo Ludowe: 32 posłów"
-            >
-              PSL (32)
-            </div>
+            {pslActive && (
+              <div
+                style={{ width: `${(32 / 460) * 100}%` }}
+                className="bg-emerald-600 flex items-center justify-center text-[11px] font-mono text-white font-bold transition-all"
+                title="Polskie Stronnictwo Ludowe: 32 posłów"
+              >
+                PSL (32)
+              </div>
+            )}
             {/* Nowa Lewica */}
+            {lewicaActive && (
+              <div
+                style={{ width: `${(26 / 460) * 100}%` }}
+                className="bg-rose-600 flex items-center justify-center text-[11px] font-mono text-white font-bold transition-all"
+                title="Nowa Lewica: 26 posłów"
+              >
+                NL (26)
+              </div>
+            )}
+            {/* Brakujące głosy koalicji lub opozycja */}
             <div
-              style={{ width: `${(26 / 460) * 100}%` }}
-              className="bg-rose-600 hover:bg-rose-500 transition-colors flex items-center justify-center text-[11px] font-mono text-white font-bold"
-              title="Nowa Lewica: 26 posłów"
+              className="bg-slate-800/80 flex-1 flex items-center justify-center text-[11px] font-mono text-slate-400"
+              title="Opozycja i posłowie poza głosowaniem"
             >
-              NL (26)
-            </div>
-            {/* Opozycja (PiS, Konfederacja, Razem, Wolni) */}
-            <div
-              style={{ width: `${(213 / 460) * 100}%` }}
-              className="bg-slate-800 flex items-center justify-center text-[11px] font-mono text-slate-400"
-              title="Opozycja: 212 posłów"
-            >
-              Opozycja (212)
+              Opozycja / Brak poparcia ({460 - currentCoalitionVotes})
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-1">
-            <span className="text-orange-400 font-semibold">• Koalicja Obywatelska: 157</span>
-            <span className="text-yellow-400 font-semibold">• Polska 2050: 32</span>
-            <span className="text-emerald-400 font-semibold">• PSL: 32</span>
-            <span className="text-rose-400 font-semibold">• Nowa Lewica: 26</span>
-            <span className="text-slate-500">• Opozycja: 212</span>
+          <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
+            <span>Biała linia = próg 231 głosów większości bezwzględnej</span>
+            <span>Koalicja łącznie: 248 posłów • Opozycja: 212 posłów</span>
           </div>
+        </div>
+
+        {/* Interactive Scenario Buttons */}
+        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <div className="text-xs font-mono uppercase tracking-wider text-slate-300 font-semibold flex items-center space-x-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span>Kliknij, aby przetestować scenariusze buntu lub braku porozumienia:</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
+            <button
+              onClick={() => setPslActive(!pslActive)}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                !pslActive
+                  ? 'bg-rose-950/80 border-rose-600 text-rose-200 shadow-md shadow-rose-950'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+              }`}
+            >
+              <div className="font-bold flex justify-between items-center">
+                <span>PSL (32 posłów)</span>
+                <span>{!pslActive ? 'WETO' : 'AKTYWNY'}</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {!pslActive ? 'PSL wstrzymuje się / przeciw' : 'Kliknij, by wyłączyć PSL'}
+              </div>
+            </button>
+
+            <button
+              onClick={() => setPl2050Active(!pl2050Active)}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                !pl2050Active
+                  ? 'bg-rose-950/80 border-rose-600 text-rose-200 shadow-md shadow-rose-950'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+              }`}
+            >
+              <div className="font-bold flex justify-between items-center">
+                <span>Polska 2050 (32 posłów)</span>
+                <span>{!pl2050Active ? 'WETO' : 'AKTYWNY'}</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {!pl2050Active ? 'Polska 2050 blokuje projekt' : 'Kliknij, by wyłączyć PL2050'}
+              </div>
+            </button>
+
+            <button
+              onClick={() => setLewicaActive(!lewicaActive)}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                !lewicaActive
+                  ? 'bg-rose-950/80 border-rose-600 text-rose-200 shadow-md shadow-rose-950'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+              }`}
+            >
+              <div className="font-bold flex justify-between items-center">
+                <span>Nowa Lewica (26 posłów)</span>
+                <span>{!lewicaActive ? 'WETO' : 'AKTYWNY'}</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                {!lewicaActive ? 'Lewica głosuje przeciw' : 'Kliknij, by wyłączyć Lewicę'}
+              </div>
+            </button>
+
+            <button
+              onClick={() => setKoActive(!koActive)}
+              className={`p-3 rounded-lg border text-left transition-all ${
+                !koActive
+                  ? 'bg-rose-950/80 border-rose-600 text-rose-200 shadow-md shadow-rose-950'
+                  : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+              }`}
+            >
+              <div className="font-bold flex justify-between items-center">
+                <span>Koalicja Obywatelska (157)</span>
+                <span>{!koActive ? 'WETO' : 'AKTYWNY'}</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">
+                Trzon większości rządowej
+              </div>
+            </button>
+          </div>
+
+          {!hasMajority && (
+            <div className="p-3.5 rounded-lg bg-rose-950/90 border border-rose-700 text-xs text-rose-200 font-sans leading-relaxed">
+              <strong className="font-mono text-white block mb-0.5">ALARM DYSCYPLINARNY DLA PREMIERA:</strong>
+              Przy tym scenariuszu rząd traci większość w Sejmie. Ustawa zostanie odrzucona przez połączone głosy opozycji i wyłamanej formacji koalicyjnej. Wymagane pilne zwołanie spotkania liderów u premiera Donalda Tuska przed skierowaniem druku do III czytania.
+            </div>
+          )}
         </div>
       </div>
 

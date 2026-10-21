@@ -14,6 +14,48 @@ interface JournalistQuestion {
   severity: 'P1_CRITICAL' | 'P2_HIGH';
 }
 
+interface OppositionAttackVector {
+  id: string;
+  party: string;
+  speaker: string;
+  targetArea: string;
+  accusation: string;
+  premierCounterArgument: string;
+}
+
+const OPPOSITION_ATTACK_VECTORS: OppositionAttackVector[] = [
+  {
+    id: 'opp-01',
+    party: 'Prawo i Sprawiedliwość',
+    speaker: 'Mateusz Morawiecki / Mariusz Błaszczak',
+    targetArea: 'Finanse publiczne i kwota wolna 60 tys. zł',
+    accusation:
+      'Zarzut złamania 100 konkretów na 100 dni, procedury nadmiernego deficytu UE oraz rzekomego zaciskania pasa kosztem polskich rodzin.',
+    premierCounterArgument:
+      'Sprzątamy gigantyczną, ukrytą dziurę budżetową po 8 latach rządów PiS (setki miliardów poza kontrolą parlamentu w BGK i PFR). Obietnice zrealizujemy w bezpiecznym horyzoncie, bez cięć w zbrojeniach i programach społecznych, które w przeciwieństwie do PiS w pełni zabezpieczyliśmy.',
+  },
+  {
+    id: 'opp-02',
+    party: 'Prawo i Sprawiedliwość',
+    speaker: 'Przemysław Czarnek / Waldemar Buda',
+    targetArea: 'Inwestycje strategiczne i CPK',
+    accusation:
+      'Oskarżenia o spowalnianie Centralnego Portu Komunikacyjnego, rzekome działanie w interesie portów lotniczych w Berlinie.',
+    premierCounterArgument:
+      'Przekształciliśmy megalomański projekt propagandowy w realną sieć nowoczesnych kolei dużych prędkości „Polska w 100 minut” oraz lotnisko w Baranowie oparte na twardych analizach biznesowych, a nie na posadach dla partyjnych nominatów.',
+  },
+  {
+    id: 'opp-03',
+    party: 'Konfederacja',
+    speaker: 'Sławomir Mentzen / Krzysztof Bosak',
+    targetArea: 'Składka zdrowotna i obciążenia przedsiębiorców',
+    accusation:
+      'Wytykanie sporów między PSL a Lewicą, zarzut utrzymywania szkodliwych przepisów Polskiego Ładu i oszukania małego biznesu.',
+    premierCounterArgument:
+      'To właśnie rząd Koalicji 15 Października naprawia katastrofalny chaos wprowadzony przez poprzedników. Negocjacje w koalicji trwają, a celem jest ulżenie przedsiębiorcom bez zapaści finansowej szpitali i przychodni.',
+  },
+];
+
 const JOURNALIST_QUESTIONS_TODAY: JournalistQuestion[] = [
   {
     id: 'jq-01',
@@ -237,7 +279,63 @@ export default function PremierPulpitPage() {
         </div>
       </div>
 
-      {/* SECTION 2: Active P1 Escalations for Prime Minister's Direct Intervention */}
+      {/* SECTION 2: Spodziewane wektory ataku opozycji i kontrargumenty KPRM */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-md p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <div className="text-xs font-mono uppercase tracking-wider text-rose-400 font-bold flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              <span>Raport Wywiadowczy KPRM</span>
+            </div>
+            <h2 className="text-lg font-bold text-white mt-0.5">
+              Główne wektory ataku opozycji na dzisiejszym posiedzeniu Sejmu
+            </h2>
+          </div>
+          <span className="text-xs font-mono text-slate-400">
+            Monitoring konferencji PiS i Konfederacji
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {OPPOSITION_ATTACK_VECTORS.map((vec) => (
+            <div
+              key={vec.id}
+              className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-4 flex flex-col justify-between"
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2 py-0.5 rounded bg-slate-800 font-mono text-[10px] text-amber-400 font-bold uppercase">
+                    {vec.party}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-500">{vec.speaker}</span>
+                </div>
+                <div className="font-bold text-xs text-white border-b border-slate-800/80 pb-2">
+                  {vec.targetArea}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-mono text-rose-400 uppercase tracking-wider block">
+                    Zarzut opozycji:
+                  </span>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans italic">
+                    &ldquo;{vec.accusation}&rdquo;
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-800/30 space-y-1">
+                <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">
+                  Kontrargument premiera:
+                </span>
+                <p className="text-xs text-amber-100 leading-relaxed font-sans">
+                  {vec.premierCounterArgument}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SECTION 3: Active P1 Escalations for Prime Minister's Direct Intervention */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center space-x-2">

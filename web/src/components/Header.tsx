@@ -130,6 +130,32 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* KPRM Operational Situation & Clocks Bar */}
+      <div className="bg-slate-950/90 border-t border-slate-900/80 px-4 sm:px-6 lg:px-8 py-1.5 text-[11px] font-mono text-slate-400 hidden md:flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <span className="flex items-center space-x-1.5 text-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span>Rada Ministrów: <strong className="text-white">Wtorek 11:00</strong></span>
+          </span>
+          <span className="text-slate-700">|</span>
+          <span className="flex items-center space-x-1.5 text-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span>Stały Komitet RM: <strong className="text-white">Czwartek 10:00</strong></span>
+          </span>
+          <span className="text-slate-700">|</span>
+          <span className="flex items-center space-x-1.5 text-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+            <span>Szczyt Rady Europejskiej: <strong className="text-white">za 6 dni (Bruksela)</strong></span>
+          </span>
+        </div>
+
+        <div className="flex items-center space-x-3 text-slate-400">
+          <span>Dyżur CIR: <strong className="text-emerald-400 font-bold">AKTYWNY</strong></span>
+          <span className="text-slate-700">|</span>
+          <span>Dostęp: <strong className="text-slate-200">KPRM Zastrzeżone</strong></span>
+        </div>
+      </div>
     </header>
   );
 };

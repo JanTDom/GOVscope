@@ -49,10 +49,21 @@ export default function RzecznikPage() {
   const [simulating, setSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<string | null>(null);
   const [broadcastNotice, setBroadcastNotice] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleBroadcastDirective = (id: string) => {
     setBroadcastNotice(`Wysłano dyrektywę ${id} kanałem pilnym CIR do rzeczników 19 ministerstw.`);
     setTimeout(() => setBroadcastNotice(null), 4000);
+  };
+
+  const handleCopySignalFormat = (dir: MediaDirectiveItem) => {
+    const formattedText = `[PILNA DYSPOZYCJA CIR - KPRM]\nData: 22.10.2026 r.\nTemat: ${dir.topic}\n\nOBOWIĄZUJĄCA LINIA RZĄDU:\n"${dir.mandatoryLine}"\n\nPUNKTY DEFENSYWNE DLA RZECZNIKÓW:\n${dir.defensivePoints.map((p) => `• ${p}`).join('\n')}\n\nNadawca: Centrum Informacyjne Rządu (CIR) • KPRM`;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(formattedText);
+      setCopiedId(dir.id);
+      setTimeout(() => setCopiedId(null), 3000);
+    }
   };
 
   const handleRunPressSparring = async () => {
@@ -207,16 +218,24 @@ export default function RzecznikPage() {
                 </ul>
               </div>
 
-              <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-xs font-mono">
+              <div className="pt-3 border-t border-slate-800 flex flex-wrap justify-between items-center gap-3 text-xs font-mono">
                 <span className="text-slate-500">
                   Zaktualizowano: {new Date(dir.updatedAt).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                 </span>
-                <button
-                  onClick={() => handleBroadcastDirective(dir.id)}
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors"
-                >
-                  Wyślij alertem do wszystkich rzeczników
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleCopySignalFormat(dir)}
+                    className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold transition-colors flex items-center space-x-1.5"
+                  >
+                    <span>{copiedId === dir.id ? '✓ Skopiowano do schowka!' : 'Kopiuj formatkę Signal/SMS'}</span>
+                  </button>
+                  <button
+                    onClick={() => handleBroadcastDirective(dir.id)}
+                    className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors"
+                  >
+                    Wyślij alertem do wszystkich rzeczników
+                  </button>
+                </div>
               </div>
             </div>
           ))}
