@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { INITIAL_CONFLICTS } from '@/lib/store';
+import { ExecutiveBriefingModal } from '@/components/ExecutiveBriefingModal';
 
 interface JournalistQuestion {
   id: string;
@@ -95,12 +96,19 @@ const JOURNALIST_QUESTIONS_TODAY: JournalistQuestion[] = [
 export default function PremierPulpitPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<string>(JOURNALIST_QUESTIONS_TODAY[0].id);
   const [directiveStatus, setDirectiveStatus] = useState<string | null>(null);
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
 
   const activeQ = JOURNALIST_QUESTIONS_TODAY.find((q) => q.id === selectedQuestion) || JOURNALIST_QUESTIONS_TODAY[0];
 
   const handleSendDirective = (target: string) => {
     setDirectiveStatus(`Wysłano autoryzowaną dyspozycję premiera do: ${target}. Status: Doręczono.`);
     setTimeout(() => setDirectiveStatus(null), 5000);
+  };
+
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
   };
 
   return (
@@ -120,18 +128,36 @@ export default function PremierPulpitPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsBriefingOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 text-xs font-semibold uppercase tracking-wider font-mono transition-all flex items-center space-x-1.5"
+            title="Włącz tryb gabinetowy na rzutnik lub tablet (Skrót: B)"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            <span>Tryb gabinetowy [B]</span>
+          </button>
+          <button
+            onClick={handlePrint}
+            className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 hover:bg-slate-800 text-xs font-semibold uppercase tracking-wider font-mono transition-all flex items-center space-x-1.5"
+            title="Drukuj teczkę A4"
+          >
+            <svg className="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Drukuj briefing</span>
+          </button>
           <Link
             href="/meldunek"
-            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20"
+            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20"
           >
-            Meldunek dobowy KPRM
+            Meldunek KPRM
           </Link>
           <Link
             href="/audytor"
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-blue-600/20 border border-blue-400/30"
+            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-blue-600/20 border border-blue-400/30"
           >
-            Audytor AI Gemini
+            Audytor Gemini
           </Link>
         </div>
       </div>
@@ -391,6 +417,12 @@ export default function PremierPulpitPage() {
           ))}
         </div>
       </div>
+
+      {/* Executive Briefing Kiosk Modal */}
+      <ExecutiveBriefingModal
+        isOpen={isBriefingOpen}
+        onClose={() => setIsBriefingOpen(false)}
+      />
     </div>
   );
 }
