@@ -64,6 +64,15 @@ export default function AudytorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [copiedVariantIndex, setCopiedVariantIndex] = useState<number | null>(null);
+
+  const handleCopyVariant = (text: string, index: number) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedVariantIndex(index);
+      setTimeout(() => setCopiedVariantIndex(null), 3000);
+    }
+  };
 
   const handleSelectPreset = (c: (typeof PRESET_CASES)[0]) => {
     setOfficialName(c.officialName);
@@ -426,6 +435,88 @@ export default function AudytorPage() {
               <div className="p-3 rounded-lg bg-slate-950/90 border border-slate-800 text-xs text-slate-400 flex items-center justify-between font-mono">
                 <span>Procedura rządowa / SKRM:</span>
                 <span className="text-slate-200 font-semibold">{auditResult.skrm_status}</span>
+              </div>
+
+              {/* Generator bezpiecznych wariantów narracyjnych */}
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <div className="text-xs font-mono uppercase tracking-wider text-amber-400 flex items-center justify-between">
+                  <span className="flex items-center space-x-1.5 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span>Generator bezpiecznych wariantów narracyjnych dla ministra:</span>
+                  </span>
+                  <span className="text-slate-500 font-normal">Gotowe do skopiowania</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {/* Wariant 1: Koncyliacyjny */}
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/90 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 uppercase">
+                        Wariant 1 • Koncyliacyjny (wyciszenie sporu w koalicji)
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleCopyVariant(
+                            `„Kwestia ${topic} jest przedmiotem odpowiedzialnego dialogu wewnątrz koalicji. Szukamy rozwiązań łączących interesy społeczne z poszanowaniem stabilności finansów państwa.”`,
+                            1
+                          )
+                        }
+                        className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                      >
+                        {copiedVariantIndex === 1 ? 'Skopiowano!' : 'Kopiuj wariant'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-200 font-serif italic leading-relaxed">
+                      &bdquo;Kwestia {topic} jest przedmiotem odpowiedzialnego dialogu wewnątrz koalicji. Szukamy rozwiązań łączących interesy społeczne z poszanowaniem stabilności finansów państwa.&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Wariant 2: Twardy KPRM */}
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/90 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 uppercase">
+                        Wariant 2 • Twardy KPRM (dyscyplina rządowa)
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleCopyVariant(
+                            `„Stanowisko rządu w sprawie ${topic} zapada kolegialnie na Radzie Ministrów. Wszelkie propozycje wymagają wcześniejszego uzgodnienia w Komitecie Ekonomicznym RM i akceptacji KPRM.”`,
+                            2
+                          )
+                        }
+                        className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                      >
+                        {copiedVariantIndex === 2 ? 'Skopiowano!' : 'Kopiuj wariant'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-200 font-serif italic leading-relaxed">
+                      &bdquo;Stanowisko rządu w sprawie {topic} zapada kolegialnie na Radzie Ministrów. Wszelkie propozycje wymagają wcześniejszego uzgodnienia w Komitecie Ekonomicznym RM i akceptacji KPRM.&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Wariant 3: Odsyłający do SKRM */}
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/90 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 uppercase">
+                        Wariant 3 • Odsyłający (procedura SKRM)
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleCopyVariant(
+                            `„Projekt znajduje się w fazie roboczych uzgodnień międzyresortowych. Właściwym miejscem rozstrzygania ewentualnych rozbieżności jest Stały Komitet Rady Ministrów.”`,
+                            3
+                          )
+                        }
+                        className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                      >
+                        {copiedVariantIndex === 3 ? 'Skopiowano!' : 'Kopiuj wariant'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-200 font-serif italic leading-relaxed">
+                      &bdquo;Projekt znajduje się w fazie roboczych uzgodnień międzyresortowych. Właściwym miejscem rozstrzygania ewentualnych rozbieżności jest Stały Komitet Rady Ministrów.&rdquo;
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

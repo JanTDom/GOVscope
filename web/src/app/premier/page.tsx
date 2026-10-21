@@ -93,16 +93,57 @@ const JOURNALIST_QUESTIONS_TODAY: JournalistQuestion[] = [
   },
 ];
 
+interface DecisionLogItem {
+  id: string;
+  time: string;
+  target: string;
+  action: string;
+  status: 'DORĘCZONO' | 'W_TOKU';
+}
+
 export default function PremierPulpitPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<string>(JOURNALIST_QUESTIONS_TODAY[0].id);
   const [directiveStatus, setDirectiveStatus] = useState<string | null>(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [decisionLogs, setDecisionLogs] = useState<DecisionLogItem[]>([
+    {
+      id: 'dec-1',
+      time: '08:45:12',
+      target: 'Centrum Informacyjne Rządu (CIR)',
+      action: 'Przekazano linię obrony Donalda Tuska ws. składki: twarde negocjacje, zero rozpadu koalicji.',
+      status: 'DORĘCZONO',
+    },
+    {
+      id: 'dec-2',
+      time: '08:30:00',
+      target: 'Stały Komitet Rady Ministrów (SKRM)',
+      action: 'Zablokowano wpisanie do porządku obrad jednostronnego projektu kredytu 0% bez akceptacji MFiPR.',
+      status: 'DORĘCZONO',
+    },
+  ]);
 
   const activeQ = JOURNALIST_QUESTIONS_TODAY.find((q) => q.id === selectedQuestion) || JOURNALIST_QUESTIONS_TODAY[0];
 
-  const handleSendDirective = (target: string) => {
-    setDirectiveStatus(`Wysłano autoryzowaną dyspozycję premiera do: ${target}. Status: Doręczono.`);
+  const handleSendDirective = (target: string, customAction?: string) => {
+    const timeStr = new Date().toLocaleTimeString('pl-PL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    const newEntry: DecisionLogItem = {
+      id: `dec-${Date.now()}`,
+      time: timeStr,
+      target,
+      action: customAction || `Wysłano autoryzowaną dyspozycję premiera do: ${target}`,
+      status: 'DORĘCZONO',
+    };
+    setDecisionLogs((prev) => [newEntry, ...prev]);
+    setDirectiveStatus(`Wysłano autoryzowaną dyspozycję premiera do: ${target}. Status: Doręczono (${timeStr}).`);
     setTimeout(() => setDirectiveStatus(null), 5000);
+  };
+
+  const handleClearLogs = () => {
+    setDecisionLogs([]);
   };
 
   const handlePrint = () => {
@@ -416,6 +457,117 @@ export default function PremierPulpitPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* PRESIDENTIAL VETO & CONSTITUTIONAL TRIBUNAL RISK RADAR */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <div className="text-xs font-mono uppercase tracking-wider text-rose-400 font-bold">
+              Zagrożenia prezydenckie i kontrola konstytucyjna
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-white font-mono mt-0.5">
+              Wskaźnik ryzyka weta prezydenckiego i wniosków do TK (Pałac Prezydencki)
+            </h2>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-950 border border-slate-700 text-slate-300">
+            Prezydent RP • Andrzej Duda
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-rose-900/60 bg-rose-950/20 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-bold text-white">Reforma KRS i sądownictwa</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-950 text-rose-300 border border-rose-800 font-bold">
+                WETO PEWNE (95%)
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              Zarzut naruszenia prerogatywy prezydenckiej przy powoływaniu sędziów. Prawdopodobne odesłanie do TK Julii Przyłębskiej w trybie prewencyjnym.
+            </p>
+            <div className="text-[11px] font-mono text-amber-300 bg-slate-950/80 p-2.5 rounded border border-slate-800">
+              <strong>Zalecana linia Tuska:</strong> &bdquo;Przywracamy praworządność metodami, które nie wymagają podpisu prezydenta: uchwały, standardy ETPCz i orzecznictwo TSUE.&rdquo;
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-900/60 bg-amber-950/20 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-bold text-white">Składka zdrowotna</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-800 font-bold">
+                ŚREDNIE (40%)
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              Pałac Prezydencki nie zawetuje ulg dla samozatrudnionych, o ile nie doprowadzą one do natychmiastowego kryzysu płynności w szpitalach powiatowych.
+            </p>
+            <div className="text-[11px] font-mono text-amber-300 bg-slate-950/80 p-2.5 rounded border border-slate-800">
+              <strong>Zalecana linia Tuska:</strong> &bdquo;Ulga dla przedsiębiorców jest naprawieniem chaosu Polskiego Ładu — nikt w Pałacu nie powinien brać w obronę tamtych błędów.&rdquo;
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-bold text-white">Tarcza Wschód i obronność</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">
+                MINIMALNE (5%)
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              Projekt koordynowany na bieżąco z BBN i Sztabem Generalnym. Bezpieczeństwo państwa wyłączone z bieżącego sporu politycznego.
+            </p>
+            <div className="text-[11px] font-mono text-emerald-400 bg-slate-950/80 p-2.5 rounded border border-slate-800">
+              <strong>Zalecana linia Tuska:</strong> &bdquo;W sprawach obrony ojczyzny i granicy rząd i prezydent mówią jednym głosem.&rdquo;
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SESSION DECISION & DIRECTIVE AUDIT LOG */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 sm:p-8 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center space-x-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+            <h2 className="text-base font-bold text-white font-mono uppercase tracking-wide">
+              Dziennik podjętych dyspozycji gabinetu (Sesja bieżąca)
+            </h2>
+            <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+              {decisionLogs.length} wpisów
+            </span>
+          </div>
+
+          {decisionLogs.length > 0 && (
+            <button
+              onClick={handleClearLogs}
+              className="text-xs font-mono px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-colors self-start sm:self-auto"
+            >
+              Wyczyść dziennik
+            </button>
+          )}
+        </div>
+
+        {decisionLogs.length === 0 ? (
+          <div className="text-center py-6 text-xs font-mono text-slate-500">
+            Brak zarejestrowanych dyspozycji w bieżącej sesji gabinetu.
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-800/60 font-mono text-xs">
+            {decisionLogs.map((log) => (
+              <div key={log.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-start sm:items-center space-x-3">
+                  <span className="text-slate-500 text-[11px] whitespace-nowrap">{log.time}</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-amber-400 text-[11px] font-bold whitespace-nowrap">
+                    {log.target}
+                  </span>
+                  <span className="text-slate-200">{log.action}</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold whitespace-nowrap self-start sm:self-auto">
+                  {log.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Executive Briefing Kiosk Modal */}

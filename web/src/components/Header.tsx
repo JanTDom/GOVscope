@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { CommandPalette } from '@/components/CommandPalette';
 import { ExecutiveBriefingModal } from '@/components/ExecutiveBriefingModal';
+import { MobileExecutiveDock } from '@/components/MobileExecutiveDock';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -238,6 +239,12 @@ export const Header: React.FC = () => {
       <ExecutiveBriefingModal
         isOpen={isExecutiveBriefingOpen}
         onClose={() => setIsExecutiveBriefingOpen(false)}
+      />
+
+      {/* Mobile & Tablet Executive Dock for iPad / Mobile */}
+      <MobileExecutiveDock
+        onOpenBriefing={() => setIsExecutiveBriefingOpen(true)}
+        onOpenSearch={() => setIsCommandPaletteOpen(true)}
       />
     </>
   );

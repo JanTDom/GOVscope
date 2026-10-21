@@ -16,6 +16,8 @@ interface LegislativeInitiative {
   conflictRisk: 'P1_CRITICAL' | 'P2_HIGH' | 'NONE';
   description: string;
   coalitionFrictionNote?: string;
+  presidentialVetoRisk: 'KRYTYCZNE' | 'BARDZO_WYSOKIE' | 'SREDNIE' | 'NISKIE' | 'MINIMALNE';
+  presidentialVetoNote: string;
 }
 
 const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
@@ -31,6 +33,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'P1_CRITICAL',
     description: 'Propozycja radykalnego powrotu do ryczałtowej składki zdrowotnej dla przedsiębiorców bez wskazania źródeł pokrycia 5 mld zł ubytku w Narodowym Funduszu Zdrowia.',
     coalitionFrictionNote: 'Otwarty sprzeciw Ministra Finansów (Andrzej Domański) oraz Minister Zdrowia (Izabela Leszczyna). Kwestia skierowana do negocjacji na szczeblu liderów koalicji.',
+    presidentialVetoRisk: 'SREDNIE',
+    presidentialVetoNote: 'Pałac Prezydencki nie wetuje ulg podatkowych dla przedsiębiorców, ale podnosi ryzyko ograniczenia dostępności szpitali powiatowych. Ryzyko weta umiarkowane.',
   },
   {
     id: 'UD202',
@@ -44,6 +48,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'P1_CRITICAL',
     description: 'Projekt dopłat do kredytów mieszkaniowych dla młodych rodzin na zakup pierwszego lokalu.',
     coalitionFrictionNote: 'Publiczne weto ze strony Polski 2050 (Katarzyna Pełczyńska-Nałęcz) oraz Nowej Lewicy. Ryzyko odrzucenia w Sejmie w przypadku braku kompromisu z budownictwem społecznym.',
+    presidentialVetoRisk: 'NISKIE',
+    presidentialVetoNote: 'Prezydent przychylny programom wspierania zakupu pierwszego lokalu dla rodzin z dziećmi. Brak przesłanek do weta.',
   },
   {
     id: 'UD89',
@@ -57,6 +63,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'P2_HIGH',
     description: 'Przekierowanie części środków Funduszu Dopłat BGK na bezpośrednie budownictwo czynszowe przez samorządy (SIM i TBS).',
     coalitionFrictionNote: 'Projekt czeka na ostateczną akceptację Komitetu Ekonomicznego RM w zakresie harmonogramu wypłat z KPO.',
+    presidentialVetoRisk: 'NISKIE',
+    presidentialVetoNote: 'Inwestycje samorządowe i społeczne cieszą się aprobatą Kancelarii Prezydenta RP.',
   },
   {
     id: 'UD15',
@@ -70,6 +78,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'NONE',
     description: 'Pakiet legislacyjny umożliwiający uproszczone wywłaszczenia pod umocnienia graniczne oraz finansowanie infrastruktury obronnej ze specjalnego funduszu (10 mld zł).',
     coalitionFrictionNote: 'Pełna dyscyplina koalicyjna. Projekt rekomendowany przez KPRM do szybkiej ścieżki sejmowej.',
+    presidentialVetoRisk: 'MINIMALNE',
+    presidentialVetoNote: 'Ścisła koordynacja z Biurem Bezpieczeństwa Narodowego (BBN) i Prezydentem RP jako Zwierzchnikiem Sił Zbrojnych. Gwarantowany podpis.',
   },
   {
     id: 'UD54',
@@ -83,6 +93,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'NONE',
     description: 'Wybór sędziowskiej części KRS przez wszystkich sędziów w bezpośrednich wyborach, wykluczenie tzw. neosędziów.',
     coalitionFrictionNote: 'Wspólne stanowisko koalicji. Analiza ryzyka dotyczy weta prezydenckiego lub skierowania do TK.',
+    presidentialVetoRisk: 'KRYTYCZNE',
+    presidentialVetoNote: 'Pewne weto lub skierowanie do Trybunału Konstytucyjnego w trybie kontroli prewencyjnej (zarzut podważania prerogatywy prezydenckiej powoływania sędziów). KPRM przygotowuje równoległe rozporządzenia.',
   },
   {
     id: 'UD77',
@@ -96,6 +108,8 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     conflictRisk: 'P2_HIGH',
     description: 'Inicjatywa liberalizacji handlu w niedziele z podwójnym wynagrodzeniem dla pracowników.',
     coalitionFrictionNote: 'Stanowczy sprzeciw Ministry Rodziny, Pracy i Polityki Społecznej Agnieszki Dziemianowicz-Bąk (Lewica) oraz związków zawodowych. Projekt nie jest projektem rządowym.',
+    presidentialVetoRisk: 'BARDZO_WYSOKIE',
+    presidentialVetoNote: 'Prezydent Andrzej Duda wielokrotnie deklarował obronę ustawy o ograniczeniu handlu w niedziele. Ustawa w obecnym kształcie nie ma szans na podpis.',
   },
 ];
 
@@ -540,6 +554,29 @@ export default function ResortyPage() {
                       {item.coalitionFrictionNote}
                     </div>
                   )}
+
+                  {/* Presidential Veto Risk Box */}
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/90 text-xs space-y-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                      <span className="font-mono text-slate-400 font-semibold uppercase text-[11px]">
+                        Ryzyko weta prezydenckiego / TK (Pałac Prezydencki):
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border self-start sm:self-auto ${
+                          item.presidentialVetoRisk === 'KRYTYCZNE' || item.presidentialVetoRisk === 'BARDZO_WYSOKIE'
+                            ? 'bg-rose-950 text-rose-300 border-rose-800'
+                            : item.presidentialVetoRisk === 'SREDNIE'
+                            ? 'bg-amber-950 text-amber-300 border-amber-800'
+                            : 'bg-emerald-950 text-emerald-300 border-emerald-800'
+                        }`}
+                      >
+                        RYZYKO: {item.presidentialVetoRisk}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 font-sans text-xs leading-relaxed">
+                      {item.presidentialVetoNote}
+                    </p>
+                  </div>
                 </div>
               );
             })}
