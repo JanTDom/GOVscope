@@ -179,14 +179,22 @@ export default function RozdziekiPage() {
                   {c.summary}
                 </p>
 
-                <div className="pt-2 border-t border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
-                  <div className="text-slate-300">
+                <div className="pt-2 border-t border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                  <div className="text-slate-300 flex-1">
                     <strong className="text-amber-400 font-mono">Rekomendowane działanie KPRM:</strong>{' '}
                     {c.recommendedAction}
                   </div>
-                  <span className="font-mono text-[11px] text-slate-500">
-                    Status: {c.resolutionStatus}
-                  </span>
+                  <div className="flex items-center space-x-3">
+                    <a
+                      href="/audytor"
+                      className="px-2.5 py-1 rounded bg-blue-950/80 hover:bg-blue-900 border border-blue-800 text-[11px] font-mono text-blue-300 transition-colors"
+                    >
+                      Audyt Gemini AI &rarr;
+                    </a>
+                    <span className="font-mono text-[11px] text-slate-500">
+                      Status: {c.resolutionStatus}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
