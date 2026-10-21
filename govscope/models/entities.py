@@ -37,6 +37,7 @@ class SourceType(str, Enum):
 
 
 class LegislativeStage(str, Enum):
+    PREKONSULTACJE = "PREKONSULTACJE"
     ZAPOWIEDZ_MEDIALNA = "ZAPOWIEDŹ_MEDIALNA"
     WYKAZ_PRAC_RM = "WYKAZ_PRAC_RM"
     KONSULTACJE_PUBLICZNE = "KONSULTACJE_PUBLICZNE"
@@ -86,6 +87,7 @@ class Ministry(BaseModel):
     body_type: str = "MINISTRY"
     coalition_party: Optional[CoalitionParty] = None
     website_url: Optional[str] = None
+    bip_url: Optional[str] = None
     rss_feeds: List[str] = Field(default_factory=list)
     social_handles: Dict[str, str] = Field(default_factory=dict)
     is_active: bool = True
@@ -117,6 +119,7 @@ class OfficialStatement(BaseModel):
     source_type: SourceType
     title: str
     content: str
+    summary: Optional[str] = None
     topic_category: Optional[str] = None
     published_at: datetime
     source_url: Optional[str] = None

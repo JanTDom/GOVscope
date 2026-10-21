@@ -10,6 +10,29 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 98,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T18:30:00Z',
+    leadership: [
+      {
+        name: 'Donald Tusk',
+        role: 'Prezes Rady Ministrów',
+        party: 'KO',
+        xHandle: '@donaldtusk',
+        responsibilities: ['Kierowanie pracami Rady Ministrów', 'Nadzór nad spójnością koalicji'],
+      },
+      {
+        name: 'Jan Grabiec',
+        role: 'Szef KPRM, Minister - Członek RM',
+        party: 'KO',
+        xHandle: '@JanGrabiec',
+        responsibilities: ['Kierowanie bieżącymi pracami kancelarii', 'Komunikacja rządowa'],
+      },
+      {
+        name: 'Maciej Berek',
+        role: 'Przewodniczący SKRM, Minister - Członek RM',
+        party: 'KO',
+        xHandle: '@MaciejBerek',
+        responsibilities: ['Przewodniczenie Stałemu Komitetowi RM', 'Koordynacja procesu legislacyjnego'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000002',
@@ -20,6 +43,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 94,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T17:15:00Z',
+    leadership: [
+      {
+        name: 'Andrzej Domański',
+        role: 'Minister Finansów',
+        party: 'KO',
+        xHandle: '@Domanski_Andrz',
+        responsibilities: ['Budżet państwa', 'Podatki', 'Dług publiczny'],
+      },
+      {
+        name: 'Hanna Majszczyk',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Wykonanie budżetu państwa', 'Finanse publiczne'],
+      },
+      {
+        name: 'Jarosław Neneman',
+        role: 'Podsekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Polityka podatkowa', 'Podatki dochodowe i majątkowe'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000003',
@@ -30,6 +74,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 96,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T16:00:00Z',
+    leadership: [
+      {
+        name: 'Radosław Sikorski',
+        role: 'Minister Spraw Zagranicznych',
+        party: 'KO',
+        xHandle: '@radeksikorski',
+        responsibilities: ['Polityka zagraniczna RP', 'Stosunki transatlantyckie', 'Dyplomacja'],
+      },
+      {
+        name: 'Władysław Teofil Bartoszewski',
+        role: 'Sekretarz Stanu',
+        party: 'PSL',
+        responsibilities: ['Sprawy pozaeuropejskie', 'Dyplomacja ekonomiczna'],
+      },
+      {
+        name: 'Andrzej Szejna',
+        role: 'Sekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Polityka wschodnia', 'Bezpieczeństwo międzynarodowe'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000004',
@@ -40,6 +105,28 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 92,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T15:45:00Z',
+    leadership: [
+      {
+        name: 'Władysław Kosiniak-Kamysz',
+        role: 'Wiceprezes Rady Ministrów, Minister Obrony Narodowej',
+        party: 'PSL',
+        xHandle: '@KosiniakKamysz',
+        responsibilities: ['Obronność państwa', 'Siły Zbrojne RP', 'Modernizacja armii'],
+      },
+      {
+        name: 'Cezary Tomczyk',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        xHandle: '@CTomczyk',
+        responsibilities: ['Modernizacja techniczna wojska', 'Infrastruktura obronna'],
+      },
+      {
+        name: 'Paweł Zalewski',
+        role: 'Sekretarz Stanu',
+        party: 'POLSKA_2050',
+        responsibilities: ['Współpraca międzynarodowa w ramach NATO'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000005',
@@ -50,6 +137,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 91,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T16:20:00Z',
+    leadership: [
+      {
+        name: 'Tomasz Siemoniak',
+        role: 'Minister Spraw Wewnętrznych i Administracji, Koordynator Służb Specjalnych',
+        party: 'KO',
+        xHandle: '@TomaszSiemoniak',
+        responsibilities: ['Bezpieczeństwo wewnętrzne', 'Służby specjalne', 'Policja i Straż Graniczna'],
+      },
+      {
+        name: 'Czesław Mroczek',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Nadzór nad formacjami mundurowymi'],
+      },
+      {
+        name: 'Wiesław Szczepański',
+        role: 'Sekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Administracja publiczna', 'Obrona cywilna'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000006',
@@ -60,6 +168,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 89,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T14:10:00Z',
+    leadership: [
+      {
+        name: 'Adam Bodnar',
+        role: 'Minister Sprawiedliwości, Prokurator Generalny',
+        party: 'KO',
+        xHandle: '@Adbodnar',
+        responsibilities: ['Wymiar sprawiedliwości', 'Sądownictwo powszechne', 'Prokuratura'],
+      },
+      {
+        name: 'Arkadiusz Myrcha',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Legislacja karna i procesowa', 'Relacje z parlamentem'],
+      },
+      {
+        name: 'Dariusz Mazur',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Ustrój sądów powszechnych', 'Sędziowie'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000007',
@@ -70,6 +199,21 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 93,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T13:00:00Z',
+    leadership: [
+      {
+        name: 'Jakub Jaworowski',
+        role: 'Minister Aktywów Państwowych',
+        party: 'KO',
+        xHandle: '@JaworowskiJ',
+        responsibilities: ['Nadzór nad spółkami Skarbu Państwa', 'Strategiczne aktywa'],
+      },
+      {
+        name: 'Robert Kropiwnicki',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Spółki sektora energetycznego i surowcowego'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000008',
@@ -80,6 +224,21 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 78,
     activeAlertsCount: 2,
     lastStatementDate: '2026-10-21T17:40:00Z',
+    leadership: [
+      {
+        name: 'Krzysztof Paszyk',
+        role: 'Minister Rozwoju i Technologii',
+        party: 'PSL',
+        xHandle: '@KrzysztofPaszyk',
+        responsibilities: ['Polityka gospodarcza', 'Mieszkalnictwo', 'Przedsiębiorczość'],
+      },
+      {
+        name: 'Ignacy Niemczycki',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Innowacje gospodarcze', 'Fundusze europejskie dla biznesu'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000009',
@@ -90,6 +249,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 82,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T12:30:00Z',
+    leadership: [
+      {
+        name: 'Paulina Hennig-Kloska',
+        role: 'Minister Klimatu i Środowiska',
+        party: 'POLSKA_2050',
+        xHandle: '@hennigkloska',
+        responsibilities: ['Transformacja energetyczna', 'Ochrona klimatu', 'Gospodarka odpadami'],
+      },
+      {
+        name: 'Miłosz Motyka',
+        role: 'Podsekretarz Stanu',
+        party: 'PSL',
+        responsibilities: ['Energetyka odnawialna', 'Czyste ciepło'],
+      },
+      {
+        name: 'Urszula Zielińska',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Relacje unijne w pakiecie klimatycznym', 'Ochrona przyrody'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000010',
@@ -100,6 +280,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 85,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T11:50:00Z',
+    leadership: [
+      {
+        name: 'Agnieszka Dziemianowicz-Bąk',
+        role: 'Minister Rodziny, Pracy i Polityki Społecznej',
+        party: 'NOWA_LEWICA',
+        xHandle: '@AgaBak',
+        responsibilities: ['Kodeks pracy', 'Płaca minimalna', 'Ubezpieczenia społeczne'],
+      },
+      {
+        name: 'Aleksandra Gajewska',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Opieka nad dziećmi do lat 3', 'Wsparcie rodzin'],
+      },
+      {
+        name: 'Łukasz Krasoń',
+        role: 'Sekretarz Stanu, Pełnomocnik Rządu ds. Osób Niepełnosprawnych',
+        party: 'POLSKA_2050',
+        responsibilities: ['Polityka wsparcia osób z niepełnosprawnościami'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000011',
@@ -110,6 +311,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 88,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T15:10:00Z',
+    leadership: [
+      {
+        name: 'Izabela Leszczyna',
+        role: 'Minister Zdrowia',
+        party: 'KO',
+        xHandle: '@Leszczyna',
+        responsibilities: ['System ochrony zdrowia', 'Finansowanie NFZ', 'Restrukturyzacja szpitali'],
+      },
+      {
+        name: 'Wojciech Konieczny',
+        role: 'Sekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Lecznictwo szpitalne', 'Ratownictwo medyczne'],
+      },
+      {
+        name: 'Urszula Demkow',
+        role: 'Podsekretarz Stanu',
+        party: 'POLSKA_2050',
+        responsibilities: ['Polityka lekowa', 'Kształcenie kadr medycznych'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000012',
@@ -120,6 +342,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 92,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T10:00:00Z',
+    leadership: [
+      {
+        name: 'Barbara Nowacka',
+        role: 'Minister Edukacji Narodowej',
+        party: 'KO',
+        xHandle: '@barbaraanowacka',
+        responsibilities: ['System oświaty', 'Podstawa programowa', 'Status zawodowy nauczycieli'],
+      },
+      {
+        name: 'Katarzyna Lubnauer',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Cyfryzacja szkół', 'Współpraca z samorządami'],
+      },
+      {
+        name: 'Joanna Mucha',
+        role: 'Sekretarz Stanu',
+        party: 'POLSKA_2050',
+        responsibilities: ['Edukacja włączająca', 'Pomoc psychologiczno-pedagogiczna'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000013',
@@ -130,6 +373,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 90,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T09:30:00Z',
+    leadership: [
+      {
+        name: 'Dariusz Wieczorek',
+        role: 'Minister Nauki i Szkolnictwa Wyższego',
+        party: 'NOWA_LEWICA',
+        xHandle: '@wieczorekdarek',
+        responsibilities: ['Szkolnictwo wyższe', 'Polska Akademia Nauk', 'Finansowanie badań'],
+      },
+      {
+        name: 'Maria Mrówczyńska',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Instytuty badawcze', 'Infrastruktura naukowa'],
+      },
+      {
+        name: 'Maciej Gdula',
+        role: 'Podsekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Polityka naukowa państwa', 'Programy grantowe'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000014',
@@ -140,6 +404,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 87,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T14:40:00Z',
+    leadership: [
+      {
+        name: 'Dariusz Klimczak',
+        role: 'Minister Infrastruktury',
+        party: 'PSL',
+        xHandle: '@DariuszKlimczak',
+        responsibilities: ['Kolej', 'Drogi ekspresowe i autostrady', 'CPK'],
+      },
+      {
+        name: 'Piotr Malepszak',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Transport kolejowy', 'PKP PLK'],
+      },
+      {
+        name: 'Paweł Gancarz',
+        role: 'Podsekretarz Stanu',
+        party: 'PSL',
+        responsibilities: ['Drogi publiczne', 'Bezpieczeństwo ruchu drogowego'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000015',
@@ -150,6 +435,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 84,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T13:20:00Z',
+    leadership: [
+      {
+        name: 'Czesław Siekierski',
+        role: 'Minister Rolnictwa i Rozwoju Wsi',
+        party: 'PSL',
+        xHandle: '@CzSiekierski',
+        responsibilities: ['Wspólna Polityka Rolna UE', 'Rynki rolne', 'Dopłaty bezpośrednie'],
+      },
+      {
+        name: 'Stefan Krajewski',
+        role: 'Sekretarz Stanu',
+        party: 'PSL',
+        responsibilities: ['Agencje rolne (ARiMR, KOWR)', 'Ubezpieczenia upraw'],
+      },
+      {
+        name: 'Michał Kołodziejczak',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Kontrole importu produktów rolnych', 'Ochrona producentów krajowych'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000016',
@@ -160,6 +466,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 95,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T16:50:00Z',
+    leadership: [
+      {
+        name: 'Krzysztof Gawkowski',
+        role: 'Wiceprezes Rady Ministrów, Minister Cyfryzacji',
+        party: 'NOWA_LEWICA',
+        xHandle: '@KGawkowski',
+        responsibilities: ['Cyberbezpieczeństwo państwa', 'Usługi cyfrowe (mObywatel)', 'Sztuczna inteligencja'],
+      },
+      {
+        name: 'Dariusz Standerski',
+        role: 'Sekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Legislacja cyfrowa', 'Wdrożenie AI Act'],
+      },
+      {
+        name: 'Michał Gramatyka',
+        role: 'Sekretarz Stanu',
+        party: 'POLSKA_2050',
+        responsibilities: ['Infrastruktura telekomunikacyjna', 'Sieć 5G'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000017',
@@ -170,6 +497,26 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 93,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T11:00:00Z',
+    leadership: [
+      {
+        name: 'Hanna Wróblewska',
+        role: 'Minister Kultury i Dziedzictwa Narodowego',
+        party: 'KO',
+        responsibilities: ['Instytucje kultury', 'Ochrona zabytków', 'Sztuki wizualne'],
+      },
+      {
+        name: 'Andrzej Wyrobiec',
+        role: 'Podsekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Finanse instytucji kultury', 'Media publiczne'],
+      },
+      {
+        name: 'Marta Cienkowska',
+        role: 'Podsekretarz Stanu',
+        party: 'POLSKA_2050',
+        responsibilities: ['Edukacja artystyczna', 'Współpraca międzynarodowa w kulturze'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000018',
@@ -180,6 +527,27 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 94,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T12:00:00Z',
+    leadership: [
+      {
+        name: 'Sławomir Nitras',
+        role: 'Minister Sportu i Turystyki',
+        party: 'KO',
+        xHandle: '@SlawomirNitras',
+        responsibilities: ['Sport wyczynowy', 'Związki sportowe', 'Infrastruktura olimpijska'],
+      },
+      {
+        name: 'Piotr Borys',
+        role: 'Sekretarz Stanu',
+        party: 'KO',
+        responsibilities: ['Turystyka krajowa i zagraniczna', 'Polska Organizacja Turystyczna'],
+      },
+      {
+        name: 'Ireneusz Nalazek',
+        role: 'Podsekretarz Stanu',
+        party: 'NOWA_LEWICA',
+        responsibilities: ['Sport powszechny dzieci i młodzieży'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000019',
@@ -190,6 +558,21 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 97,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T17:00:00Z',
+    leadership: [
+      {
+        name: 'Adam Szłapka',
+        role: 'Minister do spraw Unii Europejskiej',
+        party: 'KO',
+        xHandle: '@szlapka',
+        responsibilities: ['Reprezentacja rządu w Radzie ds. Ogólnych (GAC)', 'Koordynacja polskiego stanowiska w UE'],
+      },
+      {
+        name: 'Magdalena Sobkowiak-Czarnecka',
+        role: 'Podsekretarz Stanu',
+        party: 'NON_PARTISAN',
+        responsibilities: ['Przygotowanie prezydencji Polski w Radzie UE'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000020',
@@ -200,6 +583,15 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 81,
     activeAlertsCount: 1,
     lastStatementDate: '2026-10-21T10:15:00Z',
+    leadership: [
+      {
+        name: 'Katarzyna Kotula',
+        role: 'Minister do spraw Równości',
+        party: 'NOWA_LEWICA',
+        xHandle: '@KotulaKat',
+        responsibilities: ['Przeciwdziałanie dyskryminacji', 'Polityka równości płci', 'Związki partnerskie'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000021',
@@ -210,6 +602,15 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 96,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T09:00:00Z',
+    leadership: [
+      {
+        name: 'Marzena Okła-Drewnowicz',
+        role: 'Minister do spraw Polityki Senioralnej',
+        party: 'KO',
+        xHandle: '@OklaDrewnowicz',
+        responsibilities: ['Bon senioralny', 'Długoterminowa opieka senioralna', 'Aktywizacja osób 60+'],
+      },
+    ],
   },
   {
     id: '10000000-0000-0000-0000-000000000022',
@@ -220,5 +621,14 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     cohesionScore: 92,
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T08:45:00Z',
+    leadership: [
+      {
+        name: 'Adriana Porowska',
+        role: 'Minister do spraw Społeczeństwa Obywatelskiego',
+        party: 'POLSKA_2050',
+        xHandle: '@AdrianaPorowska',
+        responsibilities: ['Współpraca z organizacjami pozarządowymi (NGO)', 'Wolontariat', 'Ekonomia społeczna'],
+      },
+    ],
   },
 ];

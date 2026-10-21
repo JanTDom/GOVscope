@@ -3,6 +3,7 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "vector";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 -- 1. Ministries, Committees and State Bodies
 CREATE TABLE IF NOT EXISTS ministries_and_bodies (
@@ -13,8 +14,10 @@ CREATE TABLE IF NOT EXISTS ministries_and_bodies (
     body_type VARCHAR(30) NOT NULL DEFAULT 'MINISTRY', -- MINISTRY, COMMITTEE, CENTRAL_OFFICE
     coalition_party VARCHAR(50), -- KO, PSL, POLSKA_2050, NOWA_LEWICA, NON_PARTISAN
     website_url TEXT,
+    bip_url TEXT,
     rss_feeds TEXT[] DEFAULT '{}',
     social_handles JSONB DEFAULT '{}'::jsonb,
+    metadata JSONB DEFAULT '{}'::jsonb,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -44,6 +47,7 @@ CREATE TABLE IF NOT EXISTS official_statements (
     source_type VARCHAR(30) NOT NULL, -- GOV_PL, X_TWITTER, LINKEDIN, PRESS_CONFERENCE, MEDIA_INTERVIEW, SEJM_SPEECH
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    summary TEXT,
     topic_category VARCHAR(100),
     published_at TIMESTAMPTZ NOT NULL,
     source_url TEXT,
@@ -61,7 +65,7 @@ CREATE TABLE IF NOT EXISTS legislative_initiatives (
     title TEXT NOT NULL,
     sponsor_ministry_id UUID REFERENCES ministries_and_bodies(id) ON DELETE SET NULL,
     lead_official_id UUID REFERENCES officials(id) ON DELETE SET NULL,
-    stage VARCHAR(50) NOT NULL, -- ZAPOWIEDŹ_MEDIALNA, WYKAZ_PRAC_RM, KONSULTACJE_PUBLICZNE, SKRM, RADA_MINISTROW, SEJM
+    stage VARCHAR(50) NOT NULL, -- PREKONSULTACJE, WYKAZ_PRAC_RM, KONSULTACJE_PUBLICZNE, SKRM, RADA_MINISTROW, SEJM
     has_skrm_approval BOOLEAN NOT NULL DEFAULT FALSE,
     summary TEXT,
     key_assumptions TEXT[] DEFAULT '{}',
@@ -114,10 +118,11 @@ CREATE TABLE IF NOT EXISTS alerts (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Indices for performance
+-- Standard B-Tree indices for relational performance and lookups
 CREATE INDEX IF NOT EXISTS idx_ministries_code ON ministries_and_bodies(code);
 CREATE INDEX IF NOT EXISTS idx_officials_ministry ON officials(ministry_id);
 CREATE INDEX IF NOT EXISTS idx_officials_role ON officials(role_category);
+CREATE INDEX IF NOT EXISTS idx_officials_party ON officials(coalition_party);
 CREATE INDEX IF NOT EXISTS idx_statements_official ON official_statements(official_id);
 CREATE INDEX IF NOT EXISTS idx_statements_ministry ON official_statements(ministry_id);
 CREATE INDEX IF NOT EXISTS idx_statements_published_at ON official_statements(published_at DESC);
@@ -128,3 +133,13 @@ CREATE INDEX IF NOT EXISTS idx_conflicts_created_at ON narrative_conflicts(creat
 CREATE INDEX IF NOT EXISTS idx_alerts_priority ON alerts(priority);
 CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
 CREATE INDEX IF NOT EXISTS idx_media_published_at ON media_coverage(published_at DESC);
+
+-- GIN trigram indices for full-text and partial Polish morphology searching
+CREATE INDEX IF NOT EXISTS idx_statements_content_trgm ON official_statements USING gin (content gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_statements_title_trgm ON official_statements USING gin (title gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_officials_name_trgm ON officials USING gin (full_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_legislative_title_trgm ON legislative_initiatives USING gin (title gin_trgm_ops);
+
+-- pgvector HNSW index for high-dimensional semantic search
+CREATE INDEX IF NOT EXISTS idx_statements_embedding_hnsw ON official_statements USING hnsw (embedding vector_cosine_ops);
+

@@ -28,6 +28,14 @@ export type TargetAudience =
   | 'MINISTER_UE'
   | 'RESORT_LEAD';
 
+export interface MinisterLeadership {
+  name: string;
+  role: string;
+  party: CoalitionParty;
+  xHandle?: string;
+  responsibilities: string[];
+}
+
 export interface MinistryItem {
   id: string;
   code: string;
@@ -37,6 +45,7 @@ export interface MinistryItem {
   cohesionScore: number; // 0 - 100%
   activeAlertsCount: number;
   lastStatementDate: string;
+  leadership: MinisterLeadership[];
 }
 
 export interface StatementComparison {
