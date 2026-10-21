@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export const Header: React.FC = () => {
@@ -20,11 +21,16 @@ export const Header: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-6">
-            <Link href="/" className="flex items-center space-x-3">
-              <span className="font-mono text-xl font-bold tracking-wider text-slate-100">
-                GOV<span className="text-red-500">scope</span>
-              </span>
-              <span className="rounded bg-slate-800 px-2 py-0.5 text-xs font-semibold uppercase tracking-widest text-slate-400">
+            <Link href="/" className="flex items-center space-x-3 group">
+              <Image
+                src="/govscope-logo-dark.png"
+                alt="GOVscope Logo"
+                width={150}
+                height={38}
+                className="h-8 w-auto object-contain transition-opacity group-hover:opacity-90"
+                priority
+              />
+              <span className="rounded bg-slate-800/80 px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-slate-400 border border-slate-700/60 hidden sm:inline-block">
                 KPRM System
               </span>
             </Link>

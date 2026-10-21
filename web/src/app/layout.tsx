@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'GOVscope — System Monitoringu, Wczesnego Ostrzegania i Spójności Rządowej dla KPRM',
   description:
     'Rządowy radar ryzyka narracyjnego, spójności koalicyjnej i wczesnego ostrzegania dedykowany Kancelarii Prezesa Rady Ministrów oraz ministrowi ds. Unii Europejskiej.',
+  icons: {
+    icon: '/govscope-icon.png',
+  },
 };
 
 export default function RootLayout({
