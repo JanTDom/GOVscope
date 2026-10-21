@@ -67,7 +67,7 @@ export default function MeldunekPage() {
             </div>
           </div>
 
-          <div className="text-right font-mono text-xs space-y-1">
+          <div className="text-left sm:text-right font-mono text-xs space-y-1">
             <div className="inline-block px-2.5 py-1 rounded bg-rose-950/80 print:bg-neutral-200 border border-rose-800/80 print:border-neutral-400 text-rose-300 print:text-black font-bold uppercase tracking-wider">
               Zastrzeżone • Egz. pojedynczy
             </div>

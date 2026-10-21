@@ -32,7 +32,7 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     osrStatus: 'BRAK_OSR',
     conflictRisk: 'P1_CRITICAL',
     description: 'Propozycja radykalnego powrotu do ryczałtowej składki zdrowotnej dla przedsiębiorców bez wskazania źródeł pokrycia 5 mld zł ubytku w Narodowym Funduszu Zdrowia.',
-    coalitionFrictionNote: 'Otwarty sprzeciw Ministra Finansów (Andrzej Domański) oraz Minister Zdrowia (Izabela Leszczyna). Kwestia skierowana do negocjacji na szczeblu liderów koalicji.',
+    coalitionFrictionNote: 'Otwarty sprzeciw Ministra Finansów i Gospodarki (Andrzej Domański) oraz Ministry Zdrowia (Jolanta Sobierańska-Grenda). Kwestia skierowana do negocjacji na szczeblu liderów koalicji.',
     presidentialVetoRisk: 'SREDNIE',
     presidentialVetoNote: 'Pałac Prezydencki nie wetuje ulg podatkowych dla przedsiębiorców, ale podnosi ryzyko ograniczenia dostępności szpitali powiatowych. Ryzyko weta umiarkowane.',
   },
@@ -193,7 +193,7 @@ export default function ResortyPage() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Katalog resortów (19)
+            Katalog resortów ({OFFICIAL_MINISTRIES.length})
           </button>
           <button
             onClick={() => setActiveTab('LEGISLATION')}
@@ -216,13 +216,13 @@ export default function ResortyPage() {
         <div className="space-y-6">
           {/* Filters and search toolbar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Szukaj resortu lub członka rządu..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-slate-950 border border-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-amber-500 w-64 font-mono"
+                className="bg-slate-950 border border-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-amber-500 w-full sm:w-64 font-mono"
               />
             </div>
 

@@ -95,6 +95,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       badgeClass: 'bg-purple-950 text-purple-400 border-purple-800',
       action: () => navigate('/szef-kprm'),
     },
+    {
+      id: 'act-wykresy',
+      category: 'Pulpity i akcje',
+      title: 'Przejdź do: Centrum Wykresów i Metryk KPRM',
+      subtitle: '32 specjalistyczne wykresy telemetryczne spójności rządu, dyscypliny resortów i mediów',
+      badge: 'WYKRESY',
+      badgeClass: 'bg-amber-950 text-amber-400 border-amber-800',
+      action: () => navigate('/wykresy'),
+    },
 
     // Osoby
     {

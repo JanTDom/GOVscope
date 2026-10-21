@@ -9,6 +9,7 @@ import PremierPulpitPage from '../app/premier/page';
 import SzefKprmPage from '../app/szef-kprm/page';
 import RzecznikPage from '../app/rzecznik/page';
 import KoalicjaPage from '../app/koalicja/page';
+import WykresyPage from '../app/wykresy/page';
 import { Header } from '../components/Header';
 import { POST as authLoginPost } from '../app/api/auth/login/route';
 import { NextRequest } from 'next/server';
@@ -16,6 +17,7 @@ import { NextRequest } from 'next/server';
 describe('GOVscope Alert Center and EU Dimensions', () => {
   it('renders Header with Alert Center link and AI modules', () => {
     render(<Header />);
+    expect(screen.getByText('Wykresy i metryki')).toBeDefined();
     expect(screen.getByText('Centrum alertów')).toBeDefined();
     expect(screen.getByText('Wymiar europejski')).toBeDefined();
     expect(screen.getByText('Audytor AI Gemini')).toBeDefined();
@@ -78,6 +80,13 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
     render(<KoalicjaPage />);
     expect(screen.getAllByText(/Pulpit Komitetu Politycznego Koalicji/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/460 posłów/).length).toBeGreaterThan(0);
+  });
+
+  it('renders WykresyPage with telemetry charts suite and KPI indicators', () => {
+    render(<WykresyPage />);
+    expect(screen.getAllByText(/Matryca Wskaźników i Wykresów Rządowych/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Centrum Analityki i Metryk KPRM/).length).toBeGreaterThan(0);
+    expect(screen.getByText('Wszystkie wykresy (32)')).toBeDefined();
   });
 
   it('authenticates with password PDT2026 and rejects unauthorized passwords', async () => {

@@ -7,8 +7,8 @@ import { OFFICIAL_MINISTRIES } from '../lib/constants';
 import { NarrativeConflictItem } from '../types';
 
 describe('GOVscope Operational Frontend', () => {
-  it('covers all 22 Polish ministries and central bodies with coalition mapping', () => {
-    expect(OFFICIAL_MINISTRIES.length).toBe(22);
+  it('covers all Polish ministries and central bodies with coalition mapping', () => {
+    expect(OFFICIAL_MINISTRIES.length).toBe(23);
     const codes = OFFICIAL_MINISTRIES.map((m) => m.code);
     expect(codes).toContain('KPRM');
     expect(codes).toContain('MF');
@@ -18,6 +18,7 @@ describe('GOVscope Operational Frontend', () => {
     expect(codes).toContain('MS');
     expect(codes).toContain('MAP');
     expect(codes).toContain('MRiT');
+    expect(codes).toContain('ME');
     expect(codes).toContain('MKiŚ');
     expect(codes).toContain('MRPiPS');
     expect(codes).toContain('MZ');

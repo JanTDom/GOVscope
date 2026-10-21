@@ -119,10 +119,10 @@ export const INITIAL_CONFLICTS: NarrativeConflictItem[] = [
     statements: [
       {
         id: 'st-05',
-        officialName: 'Izabela Leszczyna',
-        roleTitle: 'Minister Zdrowia',
+        officialName: 'Jolanta Sobierańska-Grenda',
+        roleTitle: 'Ministra Zdrowia',
         ministryCode: 'MZ',
-        coalitionParty: 'KO',
+        coalitionParty: 'NON_PARTISAN',
         quote:
           'Koszty reformy muszą zostać w pełni zrekompensowane z dotacji budżetowej, aby szpitale powiatowe utrzymały płynność.',
         source: 'Briefing prasowy w Sejmie',

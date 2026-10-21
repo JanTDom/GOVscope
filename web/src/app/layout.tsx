@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="pl">
       <body className="bg-slate-950 text-slate-100 antialiased min-h-screen">
         <Header />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        <main className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 lg:pb-8">
           {children}
         </main>
       </body>
