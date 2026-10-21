@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { getPolishNumericDate } from '@/lib/dates';
 
 interface MediaDirectiveItem {
   id: string;
@@ -57,7 +58,7 @@ export default function RzecznikPage() {
   };
 
   const handleCopySignalFormat = (dir: MediaDirectiveItem) => {
-    const formattedText = `[PILNA DYSPOZYCJA CIR - KPRM]\nData: 22.10.2026 r.\nTemat: ${dir.topic}\n\nOBOWIĄZUJĄCA LINIA RZĄDU:\n"${dir.mandatoryLine}"\n\nPUNKTY DEFENSYWNE DLA RZECZNIKÓW:\n${dir.defensivePoints.map((p) => `• ${p}`).join('\n')}\n\nNadawca: Centrum Informacyjne Rządu (CIR) • KPRM`;
+    const formattedText = `[PILNA DYSPOZYCJA CIR - KPRM]\nData: ${getPolishNumericDate()}\nTemat: ${dir.topic}\n\nOBOWIĄZUJĄCA LINIA RZĄDU:\n"${dir.mandatoryLine}"\n\nPUNKTY DEFENSYWNE DLA RZECZNIKÓW:\n${dir.defensivePoints.map((p) => `• ${p}`).join('\n')}\n\nNadawca: Centrum Informacyjne Rządu (CIR) • KPRM`;
 
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(formattedText);

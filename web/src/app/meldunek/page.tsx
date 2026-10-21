@@ -2,8 +2,17 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { getPolishLongDate, getDailyMeldunekRef } from '@/lib/dates';
 
 export default function MeldunekPage() {
+  const [currentDateFormatted, setCurrentDateFormatted] = React.useState('');
+  const [refNum, setRefNum] = React.useState('');
+
+  React.useEffect(() => {
+    setRefNum(getDailyMeldunekRef());
+    setCurrentDateFormatted(getPolishLongDate());
+  }, []);
+
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.print();
@@ -63,10 +72,10 @@ export default function MeldunekPage() {
               Zastrzeżone • Egz. pojedynczy
             </div>
             <div className="text-slate-400 print:text-neutral-600">
-              Nr ref.: <span className="text-slate-200 print:text-black">KPRM/MD/2026/10/22-01</span>
+              Nr ref.: <span className="text-slate-200 print:text-black">{refNum || getDailyMeldunekRef()}</span>
             </div>
             <div className="text-slate-400 print:text-neutral-600">
-              Data: <span className="text-slate-200 print:text-black">22 października 2026 r.</span>
+              Data: <span className="text-slate-200 print:text-black">{currentDateFormatted || getPolishLongDate()}</span>
             </div>
             <div className="text-slate-400 print:text-neutral-600">
               Adresat: <span className="text-slate-200 print:text-black font-bold">Prezes Rady Ministrów Donald Tusk</span>

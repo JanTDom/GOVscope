@@ -20,7 +20,7 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
     expect(screen.getByText('Wymiar europejski')).toBeDefined();
     expect(screen.getByText('Audytor AI Gemini')).toBeDefined();
     expect(screen.getByText('Meldunek dobowy')).toBeDefined();
-    expect(screen.getByText('Pulpit premiera')).toBeDefined();
+    expect(screen.getByText('Pulpit Premiera')).toBeDefined();
     expect(screen.getByText('Szef KPRM')).toBeDefined();
     expect(screen.getByText('Rzecznik (CIR)')).toBeDefined();
     expect(screen.getByText('Komitet koalicji')).toBeDefined();

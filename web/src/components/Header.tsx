@@ -7,16 +7,18 @@ import { usePathname } from 'next/navigation';
 import { CommandPalette } from '@/components/CommandPalette';
 import { ExecutiveBriefingModal } from '@/components/ExecutiveBriefingModal';
 import { MobileExecutiveDock } from '@/components/MobileExecutiveDock';
+import { getPolishDateWithWeekday } from '@/lib/dates';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isExecutiveBriefingOpen, setIsExecutiveBriefingOpen] = useState(false);
+  const [currentDateString, setCurrentDateString] = useState<string>('');
 
   // Executive Core Pulpits (Rzeczywiste stanowiska i organy KPRM)
   const executiveLinks = [
-    { href: '/premier', label: 'Pulpit premiera' },
+    { href: '/premier', label: 'Pulpit Premiera' },
     { href: '/szef-kprm', label: 'Szef KPRM' },
     { href: '/rzecznik', label: 'Rzecznik (CIR)' },
     { href: '/koalicja', label: 'Komitet koalicji' },
@@ -35,6 +37,9 @@ export const Header: React.FC = () => {
 
   // Keyboard shortcut listeners (Cmd+K and B)
   useEffect(() => {
+    // Format current date dynamically in Polish
+    setCurrentDateString(getPolishDateWithWeekday());
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger hotkeys if typing in input or textarea
       const target = e.target as HTMLElement | null;
@@ -76,17 +81,17 @@ export const Header: React.FC = () => {
     <>
       <header className="border-b border-slate-800/90 bg-slate-950/95 backdrop-blur-md text-slate-100 sticky top-0 z-50 shadow-xl shadow-black/40 print:hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
+          <div className="flex h-24 sm:h-26 items-center justify-between">
             {/* Logo & Identity */}
-            <div className="flex items-center space-x-5">
-              <Link href="/" className="flex items-center space-x-3 group py-1">
-                <div className="relative py-1 px-1 rounded-xl bg-slate-900/60 border border-slate-800/60 transition-all group-hover:border-slate-700">
+            <div className="flex items-center space-x-6">
+              <Link href="/" className="flex items-center space-x-3.5 group py-1">
+                <div className="relative p-2 sm:p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800/80 transition-all group-hover:border-slate-700 shadow-md">
                   <Image
                     src="/govscope-logo-dark.png"
                     alt="GOVscope Logo"
-                    width={240}
-                    height={80}
-                    className="h-11 sm:h-13 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                    width={380}
+                    height={140}
+                    className="h-14 sm:h-18 lg:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
                     priority
                   />
                 </div>
@@ -203,28 +208,39 @@ export const Header: React.FC = () => {
         </div>
 
         {/* KPRM Operational Situation & Clocks Bar */}
-        <div className="bg-slate-950/90 border-t border-slate-900/80 px-4 sm:px-6 lg:px-8 py-1.5 text-[11px] font-mono text-slate-400 hidden md:flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center space-x-1.5 text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              <span>Rada Ministrów: <strong className="text-white">Wtorek 11:00</strong></span>
-            </span>
-            <span className="text-slate-700">|</span>
-            <span className="flex items-center space-x-1.5 text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              <span>Stały Komitet RM: <strong className="text-white">Czwartek 10:00</strong></span>
-            </span>
-            <span className="text-slate-700">|</span>
-            <span className="flex items-center space-x-1.5 text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-              <span>Szczyt Rady Europejskiej: <strong className="text-white">za 6 dni (Bruksela)</strong></span>
-            </span>
-          </div>
+        <div className="bg-slate-950/90 border-t border-slate-900/80 text-[11px] font-mono text-slate-400 hidden md:block">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {currentDateString && (
+                <>
+                  <span className="flex items-center space-x-1.5 text-amber-300 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    <span>{currentDateString}</span>
+                  </span>
+                  <span className="text-slate-700">|</span>
+                </>
+              )}
+              <span className="flex items-center space-x-1.5 text-slate-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span>Rada Ministrów: <strong className="text-white">Wtorek 11:00</strong></span>
+              </span>
+              <span className="text-slate-700">|</span>
+              <span className="flex items-center space-x-1.5 text-slate-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span>Stały Komitet RM: <strong className="text-white">Czwartek 10:00</strong></span>
+              </span>
+              <span className="text-slate-700">|</span>
+              <span className="flex items-center space-x-1.5 text-slate-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span>Szczyt Rady Europejskiej: <strong className="text-white">za 6 dni (Bruksela)</strong></span>
+              </span>
+            </div>
 
-          <div className="flex items-center space-x-3 text-slate-400">
-            <span>Dyżur CIR: <strong className="text-emerald-400 font-bold">AKTYWNY</strong></span>
-            <span className="text-slate-700">|</span>
-            <span>Dostęp: <strong className="text-slate-200">KPRM Zastrzeżone</strong></span>
+            <div className="flex items-center space-x-3 text-slate-400">
+              <span>Dyżur CIR: <strong className="text-emerald-400 font-bold">AKTYWNY</strong></span>
+              <span className="text-slate-700">|</span>
+              <span>Dostęp: <strong className="text-slate-200">KPRM Zastrzeżone</strong></span>
+            </div>
           </div>
         </div>
       </header>

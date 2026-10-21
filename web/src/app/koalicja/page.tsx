@@ -154,7 +154,7 @@ export default function KoalicjaPage() {
             href="/premier"
             className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20"
           >
-            Pulpit premiera
+            Pulpit Premiera
           </Link>
         </div>
       </div>

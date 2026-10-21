@@ -38,7 +38,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'act-briefing',
       category: 'Pulpity i akcje',
-      title: 'Uruchom tryb gabinetowy premiera (Executive Briefing)',
+      title: 'Uruchom tryb gabinetowy Premiera (Executive Briefing)',
       subtitle: 'Minimalistyczny widok pełnoekranowy na tablet i rzutnik KPRM',
       badge: 'SKRÓT B',
       badgeClass: 'bg-amber-950 text-amber-300 border-amber-800',
@@ -62,7 +62,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'act-premier',
       category: 'Pulpity i akcje',
-      title: 'Przejdź do: Pulpit Prezesa Rady Ministrów',
+      title: 'Przejdź do: Pulpit Premiera (Prezes Rady Ministrów)',
       subtitle: 'Poranna odprawa, riposty na trudne pytania dziennikarzy i wektory opozycji',
       badge: 'PREMIER',
       badgeClass: 'bg-amber-950 text-amber-400 border-amber-800',

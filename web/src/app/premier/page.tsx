@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { INITIAL_CONFLICTS } from '@/lib/store';
 import { ExecutiveBriefingModal } from '@/components/ExecutiveBriefingModal';
+import { getPolishLongDate } from '@/lib/dates';
 
 interface JournalistQuestion {
   id: string;
@@ -105,6 +106,11 @@ export default function PremierPulpitPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<string>(JOURNALIST_QUESTIONS_TODAY[0].id);
   const [directiveStatus, setDirectiveStatus] = useState<string | null>(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [currentDateFormatted, setCurrentDateFormatted] = useState<string>('');
+
+  useEffect(() => {
+    setCurrentDateFormatted(getPolishLongDate());
+  }, []);
   const [decisionLogs, setDecisionLogs] = useState<DecisionLogItem[]>([
     {
       id: 'dec-1',
@@ -251,7 +257,7 @@ export default function PremierPulpitPage() {
             </h2>
           </div>
           <span className="text-xs font-mono text-slate-400 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
-            Aktualizacja: 22 października 2026 r., godz. 07:45
+            Aktualizacja: {currentDateFormatted || '22 października 2026 r.'}, godz. 07:45
           </span>
         </div>
 
