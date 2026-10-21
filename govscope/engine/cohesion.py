@@ -1,0 +1,422 @@
+"""Government Cohesion & Conflict Engine.
+
+Analyzes official statements, legislative announcements, and coalition statements
+against the official government line, KPRM directives, and EU policies.
+"""
+
+from __future__ import annotations
+
+import re
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List, Optional, Tuple
+from uuid import UUID
+
+from govscope.models.entities import (
+    Alert,
+    ConflictType,
+    LegislativeInitiative,
+    LegislativeStage,
+    NarrativeConflict,
+    Official,
+    OfficialStatement,
+    ResolutionStatus,
+    RoleCategory,
+    Severity,
+    SourceType,
+    TargetAudience,
+)
+
+# Regex patterns for Stage 1: Routine / Operational message filtering
+ROUTINE_PATTERNS = [
+    r"\bżyczenia\s+z\s+okazji\b",
+    r"\bobchody\s+dnia\b",
+    r"\bwręczenie\s+odznaczeń\b",
+    r"\bnabór\s+wniosków\s+o\s+dofinansowanie\b",
+    r"\bogłoszono\s+konkurs\s+ofert\b",
+    r"\bposiedzenie\s+zespołu\s+roboczego\b",
+    r"\bspotkanie\s+kurtuazyjne\b",
+    r"\bharmonogram\s+pracy\s+urzędu\b",
+    r"\bprace\s+konserwacyjne\s+systemu\b",
+    r"\bzmiana\s+godzin\s+otwarcia\b",
+]
+
+# Sensitive topic vectors that require high vigilance
+POLICY_TOPICS = [
+    "składka zdrowotna",
+    "kredyt mieszkaniowy",
+    "kredyt 0%",
+    "polityka migracyjna",
+    "pakt migracyjny",
+    "podatki",
+    "budżet",
+    "deficyt",
+    "zielony ład",
+    "ets2",
+    "kpo",
+    "kamienie milowe",
+    "wymiar sprawiedliwości",
+    "praworządność",
+    "aborcja",
+    "związki partnerskie",
+    "reforma szpitali",
+    "cpk",
+    "elektrownia jądrowa",
+]
+
+
+class CohesionEngine:
+    """Evaluates narrative coherence and alerts KPRM to emerging political and institutional fractures."""
+
+    def __init__(self, expose_commitments: Optional[List[Dict[str, Any]]] = None) -> None:
+        self.expose_commitments = expose_commitments or [
+            {
+                "topic": "polityka migracyjna",
+                "core_line": "Polska nie przyjmie relokacji migrantów w ramach paktu migracyjnego.",
+                "keywords": ["pakt migracyjny", "relokacja", "migracja"],
+            },
+            {
+                "topic": "składka zdrowotna",
+                "core_line": "Obniżenie obciążeń dla drobnych przedsiębiorców z zachowaniem stabilności NFZ.",
+                "keywords": ["składka zdrowotna", "przedsiębiorcy", "nfz"],
+            },
+            {
+                "topic": "wymiar sprawiedliwości",
+                "core_line": "Przywrócenie praworządności w pełnej zgodzie ze standardami unijnymi i konstytucją.",
+                "keywords": ["praworządność", "krs", "sn", "kamienie milowe"],
+            },
+        ]
+
+    # --- STAGE 1: Routine Message Filter ---
+    def is_routine_announcement(self, text: str) -> Tuple[bool, Optional[str]]:
+        """Filters out non-substantive bureaucratic, ceremonial, and routine announcements."""
+        lowered = text.lower()
+        for pattern in ROUTINE_PATTERNS:
+            if re.search(pattern, lowered):
+                return True, f"Wykryto rutynowy komunikat administracyjny: '{pattern}'"
+        return False, None
+
+    # --- STAGE 2: Deep Logical & Policy Conflict Analysis ---
+    def evaluate_legislative_initiative(
+        self,
+        initiative: LegislativeInitiative,
+        sponsor_official: Optional[Official] = None,
+    ) -> Optional[NarrativeConflict]:
+        """Detects trial balloons ('BALON_PRÓBNY') where ministers announce laws without SKRM consensus."""
+        if initiative.stage in (LegislativeStage.ZAPOWIEDZ_MEDIALNA, LegislativeStage.WYKAZ_PRAC_RM):
+            if not initiative.has_skrm_approval:
+                # Early public announcement of a bill without SKRM committee green light
+                title = f"Balon próbny: {initiative.title} bez akceptacji SKRM"
+                summary = (
+                    f"Inicjatywa legislacyjna '{initiative.title}' została upubliczniona lub wpisana "
+                    f"do wykazu bez formalnej akceptacji Stałego Komitetu Rady Ministrów (SKRM)."
+                )
+                ministries = [initiative.sponsor_ministry_id] if initiative.sponsor_ministry_id else []
+                officials = [initiative.lead_official_id] if initiative.lead_official_id else []
+
+                return NarrativeConflict(
+                    conflict_type=ConflictType.BALON_PROBNY,
+                    severity=Severity.P2_HIGH,
+                    title=title,
+                    summary=summary,
+                    statements_involved=[
+                        {
+                            "initiative_title": initiative.title,
+                            "stage": initiative.stage.value,
+                            "has_skrm_approval": False,
+                            "summary": initiative.summary,
+                        }
+                    ],
+                    ministries_involved=ministries,
+                    officials_involved=officials,
+                    legislative_initiative_id=initiative.id,
+                    resolution_status=ResolutionStatus.DETECTED,
+                    gemini_analysis={
+                        "risk_factor": "Brak uzgodnienia międzyresortowego na etapie SKRM",
+                        "cohesion_impact": "Ryzyko publicznej kontry ze strony Ministerstwa Finansów lub KPRM",
+                    },
+                )
+        return None
+
+    def evaluate_inter_ministerial_cohesion(
+        self,
+        stmt_a: OfficialStatement,
+        official_a: Official,
+        stmt_b: OfficialStatement,
+        official_b: Official,
+    ) -> Optional[NarrativeConflict]:
+        """Detects contradictions between two ministries or coalition partners on the same topic."""
+        # Must involve two different officials or ministries
+        if stmt_a.official_id == stmt_b.official_id:
+            return None
+
+        # Check time proximity (e.g. within 72 hours)
+        delta = abs(stmt_a.published_at - stmt_b.published_at)
+        if delta > timedelta(hours=72):
+            return None
+
+        combined_text = f"{stmt_a.content} {stmt_b.content}".lower()
+
+        # Topic collision detection
+        matched_topics = [t for t in POLICY_TOPICS if t in combined_text]
+        if not matched_topics:
+            return None
+
+        topic = matched_topics[0]
+
+        # Check for direct contradictions (e.g. "będą środki" vs "brak środków", "tak" vs "nie", "nie poprzemy")
+        contradiction_markers = [
+            ("jest finansowanie", "nie ma środków"),
+            ("zostanie wprowadzone", "nie ma mowy"),
+            ("popieramy", "stanowczy sprzeciw"),
+            ("będzie kredyt 0%", "nie poprzemy kredytu 0%"),
+            ("obniżymy składkę", "nie ma zgody na obniżenie"),
+            ("zgoda rządu", "brak uzgodnienia"),
+        ]
+
+        has_direct_clash = False
+        reason = ""
+        for pos, neg in contradiction_markers:
+            if (pos in stmt_a.content.lower() and neg in stmt_b.content.lower()) or (
+                neg in stmt_a.content.lower() and pos in stmt_b.content.lower()
+            ):
+                has_direct_clash = True
+                reason = f"Zderzenie stanowisk: '{pos}' vs '{neg}'"
+                break
+
+        # Check if coalition parties differ
+        is_coalition_friction = official_a.coalition_party != official_b.coalition_party
+
+        if has_direct_clash:
+            conflict_type = (
+                ConflictType.NAPIECIE_KOALICYJNE if is_coalition_friction else ConflictType.KAKOFONIA_RESORTOWA
+            )
+            severity = Severity.P1_CRITICAL if is_coalition_friction else Severity.P2_HIGH
+
+            title = f"{conflict_type.value}: Spór w temacie '{topic}' ({official_a.role_title} vs {official_b.role_title})"
+            summary = (
+                f"Wykryto sprzeczność stanowisk między {official_a.full_name} ({official_a.coalition_party.value}) "
+                f"a {official_b.full_name} ({official_b.coalition_party.value}) w sprawie: {topic}. {reason}."
+            )
+
+            return NarrativeConflict(
+                conflict_type=conflict_type,
+                severity=severity,
+                title=title,
+                summary=summary,
+                statements_involved=[
+                    {
+                        "statement_id": str(stmt_a.id),
+                        "official": official_a.full_name,
+                        "party": official_a.coalition_party.value,
+                        "quote": stmt_a.content[:300],
+                        "source": stmt_a.source_type.value,
+                    },
+                    {
+                        "statement_id": str(stmt_b.id),
+                        "official": official_b.full_name,
+                        "party": official_b.coalition_party.value,
+                        "quote": stmt_b.content[:300],
+                        "source": stmt_b.source_type.value,
+                    },
+                ],
+                ministries_involved=[stmt_a.ministry_id, stmt_b.ministry_id],
+                officials_involved=[stmt_a.official_id, stmt_b.official_id],
+                resolution_status=ResolutionStatus.DETECTED,
+                gemini_analysis={
+                    "topic": topic,
+                    "reason": reason,
+                    "coalition_parties": [official_a.coalition_party.value, official_b.coalition_party.value],
+                    "recommended_action": "Pilne ujednolicenie przekazu na poziomie rzecznika rządu lub KPRM",
+                },
+            )
+
+        return None
+
+    def evaluate_eu_alignment(
+        self,
+        statement: OfficialStatement,
+        official: Official,
+        eu_binding_positions: Optional[List[Dict[str, str]]] = None,
+    ) -> Optional[NarrativeConflict]:
+        """Detects contradictions with Brussels negotiations or risk of EU infringement proceedings."""
+        binding = eu_binding_positions or [
+            {
+                "topic": "pakt migracyjny",
+                "risk": "ROZDŹWIĘK_Z_BRUKSELĄ",
+                "infringement_risk": False,
+                "keywords": ["pakt migracyjny", "bruksela", "unijne wytyczne"],
+            },
+            {
+                "topic": "ets2",
+                "risk": "RYZYKO_PROCEDURY_NARUSZENIOWEJ",
+                "infringement_risk": True,
+                "keywords": ["ets2", "odrzucenie dyrektywy", "nie wdrożymy"],
+            },
+            {
+                "topic": "praworządność",
+                "risk": "ROZDŹWIĘK_Z_BRUKSELĄ",
+                "infringement_risk": True,
+                "keywords": ["kamienie milowe", "tsue", "decyzja komisji"],
+            },
+        ]
+
+        lowered = statement.content.lower()
+        for rule in binding:
+            matched_keywords = [kw for kw in rule["keywords"] if kw in lowered]
+            if len(matched_keywords) >= 2:
+                # Risk trigger
+                conflict_type = (
+                    ConflictType.RYZYKO_PROCEDURY_NARUSZENIOWEJ
+                    if rule["infringement_risk"]
+                    else ConflictType.ROZDZWIEK_Z_BRUKSELA
+                )
+                title = f"{conflict_type.value}: Wypowiedź dot. {rule['topic']} kolidująca ze stanowiskiem UE"
+                summary = (
+                    f"Wypowiedź {official.full_name} ({official.role_title}) w sprawie '{rule['topic']}' "
+                    f"może zostać odczytana w Brukseli jako naruszenie zobowiązań lub kolizja ze stanowiskiem negocjacyjnym RP."
+                )
+
+                return NarrativeConflict(
+                    conflict_type=conflict_type,
+                    severity=Severity.P1_CRITICAL if rule["infringement_risk"] else Severity.P2_HIGH,
+                    title=title,
+                    summary=summary,
+                    statements_involved=[
+                        {
+                            "statement_id": str(statement.id),
+                            "official": official.full_name,
+                            "quote": statement.content[:300],
+                            "published_at": statement.published_at.isoformat(),
+                        }
+                    ],
+                    ministries_involved=[statement.ministry_id],
+                    officials_involved=[statement.official_id],
+                    resolution_status=ResolutionStatus.DETECTED,
+                    gemini_analysis={
+                        "target_pion": "Minister ds. Unii Europejskiej",
+                        "eu_rule_topic": rule["topic"],
+                        "infringement_potential": rule["infringement_risk"],
+                    },
+                )
+        return None
+
+    def evaluate_interview_risks(
+        self,
+        statement: OfficialStatement,
+        official: Official,
+    ) -> Optional[NarrativeConflict]:
+        """Detects slips during morning/evening interviews or aggression towards social groups."""
+        if statement.source_type != SourceType.MEDIA_INTERVIEW:
+            return None
+
+        content_lower = statement.content.lower()
+
+        # Aggression towards social groups
+        social_targets = [
+            ("przedsiębiorcy", ["przedsiębiorcy kombinują", "cwaniacy", "niech zamykają"]),
+            ("nauczyciele", ["leniwi nauczyciele", "za dużo wolnego"]),
+            ("rolnicy", ["roszczeniowi rolnicy", "tylko narzekają"]),
+            ("pacjenci", ["wymysły pacjentów"]),
+        ]
+
+        for group, markers in social_targets:
+            for marker in markers:
+                if marker in content_lower:
+                    title = f"Agresja wobec grupy społecznej: {group.capitalize()} ({official.full_name})"
+                    summary = (
+                        f"W porannym/wieczornym wywiadzie medialnym {official.full_name} użył sformułowań uderzających w "
+                        f"grupę: {group}. Istnieje natychmiastowe ryzyko kryzysu medialnego i protestów branżowych."
+                    )
+                    return NarrativeConflict(
+                        conflict_type=ConflictType.AGRESJA_WOBEC_GRUP_SPOLECZNYCH,
+                        severity=Severity.P1_CRITICAL,
+                        title=title,
+                        summary=summary,
+                        statements_involved=[
+                            {
+                                "statement_id": str(statement.id),
+                                "official": official.full_name,
+                                "quote": statement.content,
+                            }
+                        ],
+                        ministries_involved=[statement.ministry_id],
+                        officials_involved=[statement.official_id],
+                        resolution_status=ResolutionStatus.DETECTED,
+                        gemini_analysis={
+                            "targeted_group": group,
+                            "media_rebound_risk": "BARDZO_WYSOKIE",
+                        },
+                    )
+
+        # Unforced error in interview (BŁĄD_W_WYWIADZIE)
+        slip_markers = [
+            "nie wiem co mówił premier",
+            "to nie moja sprawa",
+            "rząd nie panuje nad",
+            "nie konsultowałem tego z premierem",
+        ]
+        for marker in slip_markers:
+            if marker in content_lower:
+                title = f"Błąd w wywiadzie medialnym: {official.full_name}"
+                summary = (
+                    f"{official.full_name} w wywiadzie medialnym sformułował niefortunne oświadczenie: '{marker}', "
+                    f"stwarzające natychmiastowe paliwo krytyczne dla opozycji i mediów."
+                )
+                return NarrativeConflict(
+                    conflict_type=ConflictType.BLAD_W_WYWIADZIE,
+                    severity=Severity.P2_HIGH,
+                    title=title,
+                    summary=summary,
+                    statements_involved=[
+                        {
+                            "statement_id": str(statement.id),
+                            "official": official.full_name,
+                            "quote": statement.content,
+                        }
+                    ],
+                    ministries_involved=[statement.ministry_id],
+                    officials_involved=[statement.official_id],
+                    resolution_status=ResolutionStatus.DETECTED,
+                    gemini_analysis={
+                        "blunder_type": "Niespójność komunikacji wewnętrznej rządu",
+                        "immediate_action": "Oświadczenie prostujące rzecznika resortu lub KPRM",
+                    },
+                )
+
+        return None
+
+    def generate_alert_for_conflict(self, conflict: NarrativeConflict) -> Alert:
+        """Constructs an instant alert with audience routing based on conflict typology."""
+        priority = (
+            "P1"
+            if conflict.severity == Severity.P1_CRITICAL
+            else ("P2" if conflict.severity == Severity.P2_HIGH else "P3")
+        )
+
+        if conflict.conflict_type in (
+            ConflictType.ROZDZWIEK_Z_BRUKSELA,
+            ConflictType.RYZYKO_PROCEDURY_NARUSZENIOWEJ,
+        ):
+            target = TargetAudience.MINISTER_UE
+        elif conflict.conflict_type in (
+            ConflictType.NAPIECIE_KOALICYJNE,
+            ConflictType.SPRZECZNOSC_Z_EXPOSE,
+        ):
+            target = TargetAudience.KPRM_PREMIER
+        else:
+            target = TargetAudience.KPRM_KOMUNIKACJA
+
+        return Alert(
+            conflict_id=conflict.id,
+            priority=priority,
+            target_audience=target,
+            channel="INTERNAL_RADAR",
+            status="QUEUED",
+            payload={
+                "conflict_title": conflict.title,
+                "conflict_type": conflict.conflict_type.value,
+                "severity": conflict.severity.value,
+                "summary": conflict.summary,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+            },
+        )
