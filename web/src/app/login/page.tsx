@@ -1,22 +1,33 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTarget = searchParams.get('redirect') || '/';
+  const rawRedirect = searchParams.get('redirect') || '/';
+  const redirectTarget =
+    rawRedirect && rawRedirect !== '/login' && !rawRedirect.startsWith('/login')
+      ? rawRedirect
+      : '/';
 
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // If already authenticated via cookie in browser, automatically redirect to dashboard
+  useEffect(() => {
+    if (typeof document !== 'undefined' && document.cookie.includes('govscope_session=authenticated_pdt_kprm_2026')) {
+      window.location.href = redirectTarget;
+    }
+  }, [redirectTarget]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password.trim()) {
+    const cleanPassword = password.trim();
+    if (!cleanPassword) {
       setError('Wprowadź hasło dostępu.');
       return;
     }
@@ -28,7 +39,7 @@ function LoginForm() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: password.trim() }),
+        body: JSON.stringify({ password: cleanPassword }),
       });
 
       const data = await res.json();
@@ -39,8 +50,16 @@ function LoginForm() {
         return;
       }
 
-      router.push(redirectTarget);
-      router.refresh();
+      // Client-side cookie fallback to guarantee persistence across all browsers/webviews
+      try {
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        document.cookie = `govscope_session=authenticated_pdt_kprm_2026; path=/; max-age=604800; samesite=lax${isHttps ? '; secure' : ''}`;
+      } catch {
+        // ignore
+      }
+
+      // Hard document navigation ensures cookies are sent fresh in request headers to bypass App Router cache
+      window.location.href = redirectTarget;
     } catch {
       setError('Błąd połączenia z serwerem uwierzytelniania KPRM.');
       setLoading(false);
@@ -92,7 +111,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 hover:from-blue-600 hover:to-indigo-500 text-white font-medium py-3 px-4 text-sm transition-all shadow-lg shadow-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-500/30"
+          className="w-full rounded-lg bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 hover:from-blue-600 hover:to-indigo-500 text-white font-medium py-3 px-4 text-sm transition-all shadow-lg shadow-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-500/30 font-mono"
         >
           {loading ? (
             <span className="flex items-center justify-center space-x-2">

@@ -4,6 +4,14 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const sessionCookie = request.cookies.get('govscope_session');
+  const isAuthenticated = !!(sessionCookie && sessionCookie.value);
+
+  // If already authenticated and trying to visit /login, redirect straight to dashboard
+  if (pathname === '/login' && isAuthenticated) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   // Allow static files, api auth, and login page
   if (
     pathname.startsWith('/_next') ||
@@ -14,9 +22,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const sessionCookie = request.cookies.get('govscope_session');
-
-  if (!sessionCookie || !sessionCookie.value) {
+  if (!isAuthenticated) {
     // For API calls, return JSON 401 instead of redirecting to login page
     if (pathname.startsWith('/api/')) {
       return NextResponse.json(
