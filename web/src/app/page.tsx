@@ -1,15 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { INITIAL_METRICS, INITIAL_CONFLICTS } from '@/lib/store';
+import type { NarrativeConflictItem, SystemMetricSummary } from '@/types';
 import { MetricCard } from '@/components/MetricCard';
 import { ConflictCard } from '@/components/ConflictCard';
 
 export default function RadarKPRMPage() {
-  const metrics = INITIAL_METRICS;
-  const conflicts = INITIAL_CONFLICTS;
+  const [metrics, setMetrics] = useState<SystemMetricSummary>(INITIAL_METRICS);
+  const [conflicts, setConflicts] = useState<NarrativeConflictItem[]>(INITIAL_CONFLICTS);
   const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'P1' | 'P2' | 'P3' | 'KOALICJA'>('ALL');
+
+  useEffect(() => {
+    fetch('/api/radar', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Nie udało się pobrać danych radaru');
+        return response.json() as Promise<{ metrics: SystemMetricSummary; conflicts: NarrativeConflictItem[] }>;
+      })
+      .then((payload) => {
+        setMetrics(payload.metrics);
+        setConflicts(payload.conflicts);
+      })
+      .catch(() => {
+        setMetrics(INITIAL_METRICS);
+        setConflicts([]);
+      });
+  }, []);
 
   // Breakdown by risk categories
   const categoryCounts: Record<string, number> = {

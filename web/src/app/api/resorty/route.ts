@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { OFFICIAL_MINISTRIES } from '@/lib/constants';
+import { getLiveMinistries } from '@/lib/live-data';
 
 export async function GET() {
+  const ministries = await getLiveMinistries();
   return NextResponse.json({
-    totalCount: OFFICIAL_MINISTRIES.length,
+    totalCount: ministries.length,
     timestamp: new Date().toISOString(),
-    ministries: OFFICIAL_MINISTRIES,
+    ministries,
+    dataStatus: 'VERIFIED_SOURCE_DATA',
   });
 }

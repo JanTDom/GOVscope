@@ -30,9 +30,9 @@ describe('GOVscope Ministries & Clashes Views', () => {
     expect(screen.getByPlaceholderText('Szukaj resortu lub członka rządu...')).toBeDefined();
   });
 
-  it('renders RozdziekiPage with timeline confrontation', () => {
+  it('renders RozdziekiPage with an honest empty state before verified ingest', () => {
     render(<RozdziekiPage />);
     expect(screen.getByText('Detektor rozdźwięków — oś czasu i analiza zderzeń wypowiedzi')).toBeDefined();
-    expect(screen.getAllByText(/Sedno sprzeczności|Analiza logiczna sprzeczności/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Brak zweryfikowanych zderzeń wypowiedzi/)).toBeDefined();
   });
 });
