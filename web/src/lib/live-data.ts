@@ -45,6 +45,7 @@ export async function getLiveConflicts(): Promise<NarrativeConflictItem[]> {
     resolutionStatus: String(row.resolution_status ?? 'DETECTED') as NarrativeConflictItem['resolutionStatus'],
     statements: Array.isArray(row.statements_involved) ? row.statements_involved.map((item) => statementFromRow(item as JsonRecord)) : [],
     recommendedAction: String(row.recommended_action ?? 'Wymaga weryfikacji przez dyżur KPRM.'),
+    ministriesInvolved: Array.isArray(row.ministries_involved) ? row.ministries_involved.map(String) : [],
     euImpact: row.gemini_analysis && typeof row.gemini_analysis === 'object' ? row.gemini_analysis as NarrativeConflictItem['euImpact'] : undefined,
   }));
 }
@@ -70,7 +71,12 @@ export async function getLiveMetrics(): Promise<SystemMetricSummary> {
 }
 
 export async function getLiveMinistries(): Promise<MinistryItem[]> {
-  const rows = await readTable<JsonRecord>('ministries_and_bodies', 'select=*&order=short_name.asc');
+  const [rows, officials, conflicts, statements] = await Promise.all([
+    readTable<JsonRecord>('ministries_and_bodies', 'select=*&order=short_name.asc'),
+    readTable<JsonRecord>('officials', 'select=id,ministry_id,full_name,role_title,coalition_party,responsibilities&is_active=eq.true&order=full_name.asc'),
+    readTable<JsonRecord>('narrative_conflicts', 'select=ministries_involved,severity&verified=eq.true&resolution_status=neq.RESOLVED'),
+    readTable<JsonRecord>('official_statements', 'select=ministry_id,published_at&verified=eq.true&source_url=not.is.null&order=published_at.desc'),
+  ]);
   return rows.map((row) => ({
     id: String(row.id),
     code: String(row.code),
@@ -78,8 +84,13 @@ export async function getLiveMinistries(): Promise<MinistryItem[]> {
     shortName: String(row.short_name),
     coalitionParty: String(row.coalition_party ?? 'NON_PARTISAN') as MinistryItem['coalitionParty'],
     cohesionScore: 100,
-    activeAlertsCount: 0,
-    lastStatementDate: '',
-    leadership: [],
+    activeAlertsCount: conflicts.filter((conflict) => Array.isArray(conflict.ministries_involved) && conflict.ministries_involved.includes(row.id)).length,
+    lastStatementDate: String(statements.find((statement) => statement.ministry_id === row.id)?.published_at ?? ''),
+    leadership: officials.filter((official) => official.ministry_id === row.id).map((official) => ({
+      name: String(official.full_name),
+      role: String(official.role_title),
+      party: String(official.coalition_party ?? 'NON_PARTISAN') as MinistryItem['leadership'][number]['party'],
+      responsibilities: Array.isArray(official.responsibilities) ? official.responsibilities.map(String) : [],
+    })),
   }));
 }

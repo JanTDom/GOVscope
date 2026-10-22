@@ -14,6 +14,23 @@ interface AlertItem {
 
 export async function GET(request: NextRequest) {
   const conflicts = await getLiveConflicts();
+  const { searchParams } = new URL(request.url);
+  const ministry = searchParams.get('ministry')?.trim().toUpperCase();
+  let ministryId = '';
+  if (ministry) {
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (baseUrl && anonKey) {
+      const response = await fetch(`${baseUrl}/rest/v1/ministries_and_bodies?select=id&code=eq.${encodeURIComponent(ministry)}&limit=1`, {
+        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const rows = await response.json() as Array<{ id?: string }>;
+        ministryId = String(rows[0]?.id ?? '');
+      }
+    }
+  }
   const alerts: AlertItem[] = conflicts.map((c) => ({
     id: `alert-${c.id}`,
     conflictId: c.id,
@@ -24,12 +41,14 @@ export async function GET(request: NextRequest) {
     status: c.resolutionStatus === 'RESOLVED' ? 'RESOLVED' : 'DELIVERED',
     createdAt: c.detectedAt,
   }));
-  const { searchParams } = new URL(request.url);
   const priority = searchParams.get('priority');
 
-  const filtered = priority
-    ? alerts.filter((a) => a.priority === priority)
-    : alerts;
+  const filtered = alerts.filter((alert) => {
+    const conflict = conflicts.find((item) => item.id === alert.conflictId);
+    const matchesPriority = !priority || alert.priority === priority;
+    const matchesMinistry = !ministry || Boolean(ministryId && conflict?.ministriesInvolved?.includes(ministryId));
+    return matchesPriority && matchesMinistry;
+  });
 
   return NextResponse.json({
     total: filtered.length,

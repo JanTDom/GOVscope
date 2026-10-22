@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { OFFICIAL_MINISTRIES } from '@/lib/constants';
-import { CoalitionParty } from '@/types';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { CoalitionParty, MinistryItem } from '@/types';
 
 interface LegislativeInitiative {
   id: string;
@@ -114,11 +114,22 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
 ];
 
 export default function ResortyPage() {
+  const [ministries, setMinistries] = useState<MinistryItem[]>([]);
   const [activeTab, setActiveTab] = useState<'MINISTRIES' | 'LEGISLATION'>('MINISTRIES');
   const [selectedParty, setSelectedParty] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [expandedMinistryId, setExpandedMinistryId] = useState<string | null>(null);
   const [legislationFilter, setLegislationFilter] = useState<'ALL' | 'BALON_PROBNY' | 'UZGODNIENIA' | 'ZATWIERDZONE'>('ALL');
+
+  useEffect(() => {
+    fetch('/api/resorty', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Nie udało się pobrać aktualnej obsady');
+        return response.json() as Promise<{ ministries?: MinistryItem[] }>;
+      })
+      .then((payload) => setMinistries(Array.isArray(payload.ministries) ? payload.ministries : []))
+      .catch(() => setMinistries([]));
+  }, []);
 
   const getPartyClass = (party: string) => {
     switch (party) {
@@ -141,7 +152,7 @@ export default function ResortyPage() {
     return 'text-red-400';
   };
 
-  const filteredMinistries = OFFICIAL_MINISTRIES.filter((m) => {
+  const filteredMinistries = ministries.filter((m) => {
     const matchesParty = selectedParty === 'ALL' || m.coalitionParty === selectedParty;
     const query = searchQuery.toLowerCase().trim();
     if (!query) return matchesParty;
@@ -193,7 +204,7 @@ export default function ResortyPage() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Katalog resortów ({OFFICIAL_MINISTRIES.length})
+            Katalog resortów ({ministries.length})
           </button>
           <button
             onClick={() => setActiveTab('LEGISLATION')}
@@ -235,7 +246,7 @@ export default function ResortyPage() {
                     : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
                 }`}
               >
-                Wszystkie ({OFFICIAL_MINISTRIES.length})
+                Wszystkie ({ministries.length})
               </button>
               {(['KO', 'PSL', 'POLSKA_2050', 'NOWA_LEWICA'] as CoalitionParty[]).map((party) => (
                 <button
@@ -298,9 +309,9 @@ export default function ResortyPage() {
                       <div className="text-center min-w-[80px]">
                         <span className="text-slate-400 block text-[11px]">Alerty</span>
                         {m.activeAlertsCount > 0 ? (
-                          <span className="rounded bg-red-950 px-2 py-0.5 font-bold text-red-400 border border-red-800 inline-block mt-0.5">
+                          <Link href={`/alerty?ministry=${encodeURIComponent(m.code)}`} className="rounded bg-red-950 px-2 py-0.5 font-bold text-red-400 border border-red-800 inline-block mt-0.5 hover:bg-red-900">
                             {m.activeAlertsCount} aktywne
-                          </span>
+                          </Link>
                         ) : (
                           <span className="text-slate-500 inline-block mt-0.5">0 uwag</span>
                         )}
@@ -309,12 +320,12 @@ export default function ResortyPage() {
                       <div className="text-right hidden lg:block">
                         <span className="text-slate-400 block text-[11px]">Ostatnia wypowiedź</span>
                         <span className="text-slate-300">
-                          {new Date(m.lastStatementDate).toLocaleDateString('pl-PL', {
+                          {m.lastStatementDate ? new Date(m.lastStatementDate).toLocaleDateString('pl-PL', {
                             day: '2-digit',
                             month: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit',
-                          })}
+                          }) : 'Brak zweryfikowanej wypowiedzi'}
                         </span>
                       </div>
 

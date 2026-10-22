@@ -102,12 +102,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
         party: 'PSL',
         responsibilities: ['Sprawy pozaeuropejskie', 'Dyplomacja ekonomiczna'],
       },
-      {
-        name: 'Andrzej Szejna',
-        role: 'Sekretarz Stanu',
-        party: 'NOWA_LEWICA',
-        responsibilities: ['Polityka wschodnia', 'Bezpieczeństwo międzynarodowe'],
-      },
     ],
   },
   {
@@ -270,12 +264,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
         party: 'POLSKA_2050',
         xHandle: '@hennigkloska',
         responsibilities: ['Transformacja energetyczna', 'Ochrona klimatu', 'Gospodarka odpadami'],
-      },
-      {
-        name: 'Miłosz Motyka',
-        role: 'Podsekretarz Stanu',
-        party: 'PSL',
-        responsibilities: ['Energetyka odnawialna', 'Czyste ciepło'],
       },
       {
         name: 'Urszula Zielińska',
@@ -457,12 +445,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
         xHandle: '@StefanKrajewski',
         responsibilities: ['Wspólna Polityka Rolna UE', 'Rynki rolne', 'Dopłaty bezpośrednie i agencje rolne'],
       },
-      {
-        name: 'Michał Kołodziejczak',
-        role: 'Sekretarz Stanu',
-        party: 'KO',
-        responsibilities: ['Kontrole importu produktów rolnych', 'Ochrona producentów krajowych'],
-      },
     ],
   },
   {
@@ -635,7 +617,7 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     ],
   },
   {
-    id: '10000000-0000-0000-0000-000000000023',
+    id: '10000000-0000-0000-0000-000000000028',
     code: 'ME',
     namePl: 'Ministerstwo Energii',
     shortName: 'ME',

@@ -75,6 +75,7 @@ export interface NarrativeConflictItem {
     brusselsContext: string;
   };
   recommendedAction: string;
+  ministriesInvolved?: string[];
 }
 
 export interface SystemMetricSummary {
