@@ -60,7 +60,7 @@ export default function EuropaPage() {
       date: '17 listopada 2026',
       name: 'Rada do Spraw Ogólnych (GAC)',
       city: 'Bruksela',
-      leadOfficial: 'Adam Szłapka (Minister ds. UE)',
+      leadOfficial: 'Radosław Sikorski (Minister Spraw Zagranicznych, KSE)',
       mainAgenda: 'Przygotowanie do posiedzenia Rady Europejskiej, przegląd praworządności, stan negocjacji wieloletnich ram finansowych.',
     },
     {

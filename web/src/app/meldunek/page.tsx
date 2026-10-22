@@ -174,7 +174,7 @@ export default function MeldunekPage() {
                     <td className="py-2 px-3 text-right font-mono text-rose-400 print:text-black font-bold">Rozdźwięk P1</td>
                   </tr>
                   <tr>
-                    <td className="py-2 px-3 font-semibold">Adam Bodnar (MS)</td>
+                    <td className="py-2 px-3 font-semibold">Waldemar Żurek (MS)</td>
                     <td className="py-2 px-3">TVN24</td>
                     <td className="py-2 px-3">Informacja o harmonogramie ustaw praworządnościowych i uzgodnieniach z KE.</td>
                     <td className="py-2 px-3 text-right font-mono text-emerald-400 print:text-black font-bold">100% Zgodne</td>
@@ -191,7 +191,7 @@ export default function MeldunekPage() {
             </h2>
             <div className="p-4 rounded-xl bg-slate-950/80 print:bg-neutral-50 border border-slate-800 print:border-neutral-300 text-xs text-slate-300 print:text-black leading-relaxed space-y-2">
               <p>
-                <strong>Procedura nadmiernego deficytu:</strong> Minister ds. UE Adam Szłapka oraz MF sfinalizowali założenia planu strukturalno-budżetowego. Ryzyko uwag KE oceniono na niskie pod warunkiem utrzymania dyscypliny wydatkowej.
+                <strong>Procedura nadmiernego deficytu:</strong> Minister Finansów i Gospodarki Andrzej Domański oraz Komitet do Spraw Europejskich sfinalizowali założenia planu strukturalno-budżetowego. Ryzyko uwag KE oceniono na niskie pod warunkiem utrzymania dyscypliny wydatkowej.
               </p>
               <p>
                 <strong>KPO:</strong> Złożenie czwartego i piątego wniosku o płatność przebiega zgodnie z harmonogramem. Brak kolizji z kamieniami milowymi.

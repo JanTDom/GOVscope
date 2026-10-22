@@ -974,7 +974,7 @@ export default function WykresyPage() {
                 <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">Wykres 25 • CIR Rzecznik</span>
                 <h3 className="text-sm font-bold text-white">Wskaźnik obrony medialnej rządu</h3>
               </div>
-              <span className="text-xs font-mono text-emerald-400 font-bold">Adam Szłapka</span>
+              <span className="text-xs font-mono text-emerald-400 font-bold">Radosław Sikorski</span>
             </div>
             <div className="h-44 flex flex-col justify-center space-y-3 font-mono text-xs">
               <div className="flex justify-between items-center p-2.5 rounded-xl bg-slate-950 border border-slate-800">

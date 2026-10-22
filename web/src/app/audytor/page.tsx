@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { OFFICIAL_MINISTRIES } from '@/lib/constants';
+import React, { useEffect, useState } from 'react';
+import type { MinistryItem } from '@/types';
 
 interface AuditResult {
   overall_risk_score: number;
@@ -53,6 +53,7 @@ const PRESET_CASES = [
 ];
 
 export default function AudytorPage() {
+  const [ministries, setMinistries] = useState<MinistryItem[]>([]);
   const [officialName, setOfficialName] = useState(PRESET_CASES[0].officialName);
   const [roleTitle, setRoleTitle] = useState(PRESET_CASES[0].roleTitle);
   const [ministryCode, setMinistryCode] = useState(PRESET_CASES[0].ministryCode);
@@ -65,6 +66,13 @@ export default function AudytorPage() {
   const [error, setError] = useState<string | null>(null);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [copiedVariantIndex, setCopiedVariantIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('/api/resorty', { cache: 'no-store' })
+      .then((response) => response.json() as Promise<{ ministries?: MinistryItem[] }>)
+      .then((payload) => setMinistries(Array.isArray(payload.ministries) ? payload.ministries : []))
+      .catch(() => setMinistries([]));
+  }, []);
 
   const handleCopyVariant = (text: string, index: number) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -236,7 +244,7 @@ export default function AudytorPage() {
                   onChange={(e) => setMinistryCode(e.target.value)}
                   className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
                 >
-                  {OFFICIAL_MINISTRIES.map((m) => (
+                  {ministries.map((m) => (
                     <option key={m.code} value={m.code}>
                       {m.code} — {m.namePl}
                     </option>

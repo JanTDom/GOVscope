@@ -26,13 +26,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
         responsibilities: ['Kierowanie bieżącymi pracami kancelarii', 'Komunikacja rządowa'],
       },
       {
-        name: 'Adam Szłapka',
-        role: 'Rzecznik Prasowy Rządu, Sekretarz Stanu w KPRM',
-        party: 'KO',
-        xHandle: '@szlapka',
-        responsibilities: ['Komunikacja strategiczna rządu', 'Kierowanie Centrum Informacyjnym Rządu (CIR)'],
-      },
-      {
         name: 'Tomasz Siemoniak',
         role: 'Minister Koordynator Służb Specjalnych',
         party: 'KO',
@@ -544,13 +537,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     activeAlertsCount: 0,
     lastStatementDate: '2026-10-21T17:00:00Z',
     leadership: [
-      {
-        name: 'Adam Szłapka',
-        role: 'Minister do spraw Unii Europejskiej',
-        party: 'KO',
-        xHandle: '@szlapka',
-        responsibilities: ['Reprezentacja rządu w Radzie ds. Ogólnych (GAC)', 'Koordynacja polskiego stanowiska w UE'],
-      },
       {
         name: 'Magdalena Sobkowiak-Czarnecka',
         role: 'Podsekretarz Stanu',

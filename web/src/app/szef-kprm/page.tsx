@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { OFFICIAL_MINISTRIES } from '@/lib/constants';
+import type { MinistryItem } from '@/types';
 
 interface LegislativeDraftCheck {
   id: string;
@@ -41,7 +41,7 @@ const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [
     rclNumber: 'UD-98',
     title: 'Projekt ustawy o zmianie ustawy o Krajowej Radzie Sądownictwa (Praworządność)',
     applicantMinistry: 'MS',
-    applicantMinister: 'Adam Bodnar',
+    applicantMinister: 'Waldemar Żurek',
     skrmApprovalStatus: 'UZGODNIONE',
     fiscalImpactAssessment: 'POZYTYWNA_MF',
     notes: 'Pełna zgodność z harmonogramem rządu i kamieniami milowymi KPO. Zgoda Komitetu do Spraw Europejskich.',
@@ -59,9 +59,17 @@ const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [
 ];
 
 export default function SzefKprmPage() {
+  const [ministries, setMinistries] = useState<MinistryItem[]>([]);
   const [drafts, setDrafts] = useState<LegislativeDraftCheck[]>(LEGISLATIVE_DRAFTS_MONITORED);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/resorty', { cache: 'no-store' })
+      .then((response) => response.json() as Promise<{ ministries?: MinistryItem[] }>)
+      .then((payload) => setMinistries(Array.isArray(payload.ministries) ? payload.ministries : []))
+      .catch(() => setMinistries([]));
+  }, []);
 
   const handleAction = (id: string, actionType: string) => {
     setActionNotice(`Zastosowano dyspozycję SKRM: ${actionType} dla projektu ${id}. Zaktualizowano w systemie KPRM.`);
@@ -280,7 +288,7 @@ export default function SzefKprmPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {OFFICIAL_MINISTRIES.slice(0, 9).map((m) => (
+          {ministries.slice(0, 9).map((m) => (
             <div
               key={m.id}
               className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-2 text-xs"

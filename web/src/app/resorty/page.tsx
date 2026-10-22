@@ -85,7 +85,7 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     id: 'UD54',
     title: 'Ustawa o zmianie ustawy o Krajowej Radzie Sądownictwa (przywrócenie praworządności)',
     ministryCode: 'MS',
-    leadPerson: 'Adam Bodnar (Minister Sprawiedliwości)',
+    leadPerson: 'Waldemar Żurek (Minister Sprawiedliwości)',
     party: 'KO',
     kprmStatus: 'ZATWIERDZONY',
     kprmStatusLabel: 'Zatwierdzony przez Radę Ministrów',

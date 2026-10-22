@@ -72,7 +72,7 @@ export async function getLiveMetrics(): Promise<SystemMetricSummary> {
 
 export async function getLiveMinistries(): Promise<MinistryItem[]> {
   const [rows, officials, conflicts, statements] = await Promise.all([
-    readTable<JsonRecord>('ministries_and_bodies', 'select=*&order=short_name.asc'),
+    readTable<JsonRecord>('ministries_and_bodies', 'select=*&is_active=eq.true&order=short_name.asc'),
     readTable<JsonRecord>('officials', 'select=id,ministry_id,full_name,role_title,coalition_party,responsibilities&is_active=eq.true&order=full_name.asc'),
     readTable<JsonRecord>('narrative_conflicts', 'select=ministries_involved,severity&verified=eq.true&resolution_status=neq.RESOLVED'),
     readTable<JsonRecord>('official_statements', 'select=ministry_id,published_at&verified=eq.true&source_url=not.is.null&order=published_at.desc'),

@@ -172,7 +172,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'pol-szlapka',
       category: 'Osoby',
-      title: 'Adam Szłapka',
+      title: 'Radosław Sikorski',
       subtitle: 'Minister ds. Unii Europejskiej • Koalicja Obywatelska (naruszenia, prezydencja)',
       badge: 'UE / KO',
       badgeClass: 'bg-blue-950 text-blue-400 border-blue-800',
