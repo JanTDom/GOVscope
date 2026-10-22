@@ -16,51 +16,15 @@ interface AuditResult {
   skrm_status: string;
 }
 
-const PRESET_CASES = [
-  {
-    title: 'Spór o składkę zdrowotną (MF vs PSL/MRiT)',
-    officialName: 'Krzysztof Paszyk',
-    roleTitle: 'Minister Rozwoju i Technologii',
-    ministryCode: 'MRiT',
-    coalitionParty: 'PSL',
-    topic: 'Składka zdrowotna dla przedsiębiorców',
-    sourceMedium: 'Poranna rozmowa RMF FM',
-    statementText:
-      'Polskie Stronnictwo Ludowe nie poprze budżetu na kolejny rok bez pełnego powrotu do zasad rozliczania składki zdrowotnej sprzed Polskiego Ładu. To jest nasz bezwzględny warunek koalicyjny, niezależnie od tego, co mówi Ministerstwo Finansów.',
-  },
-  {
-    title: 'Kredyt 0% / Mieszkanie na start (MRiT vs MFiPR)',
-    officialName: 'Katarzyna Pełczyńska-Nałęcz',
-    roleTitle: 'Minister Funduszy i Polityki Regionalnej',
-    ministryCode: 'MFiPR',
-    coalitionParty: 'PL2050',
-    topic: 'Dopłaty do kredytów hipotecznych',
-    sourceMedium: 'Wpis na platformie X',
-    statementText:
-      'Kredyt 0% nie ma i nie będzie miał poparcia Polski 2050. Dopłacanie deweloperom z kieszeni podatnika tylko nakręca bańkę cenową mieszkań. Pieniądze z KPO i budżetu muszą pójść na budownictwo społeczne, a nie na zyski banków.',
-  },
-  {
-    title: 'Procedura nadmiernego deficytu (MF w Brukseli vs wydatki)',
-    officialName: 'Andrzej Domański',
-    roleTitle: 'Minister Finansów',
-    ministryCode: 'MF',
-    coalitionParty: 'KO',
-    topic: 'Dyscyplina budżetowa i wymogi Komisji Europejskiej',
-    sourceMedium: 'Konferencja prasowa po posiedzeniu Rady ECOFIN',
-    statementText:
-      'Polska znajduje się w procedurze nadmiernego deficytu i musimy przedstawić Komisji Europejskiej wiarygodną, czteroletnią ścieżkę konsolidacji fiskalnej. Każdy resort, który planuje nowe programy wydatkowe, musi wskazać źródła ich sfinansowania lub cięcia w innych obszarach.',
-  },
-];
-
 export default function AudytorPage() {
   const [ministries, setMinistries] = useState<MinistryItem[]>([]);
-  const [officialName, setOfficialName] = useState(PRESET_CASES[0].officialName);
-  const [roleTitle, setRoleTitle] = useState(PRESET_CASES[0].roleTitle);
-  const [ministryCode, setMinistryCode] = useState(PRESET_CASES[0].ministryCode);
-  const [coalitionParty, setCoalitionParty] = useState(PRESET_CASES[0].coalitionParty);
-  const [topic, setTopic] = useState(PRESET_CASES[0].topic);
-  const [sourceMedium, setSourceMedium] = useState(PRESET_CASES[0].sourceMedium);
-  const [statementText, setStatementText] = useState(PRESET_CASES[0].statementText);
+  const [officialName, setOfficialName] = useState('');
+  const [roleTitle, setRoleTitle] = useState('');
+  const [ministryCode, setMinistryCode] = useState('');
+  const [coalitionParty, setCoalitionParty] = useState('');
+  const [topic, setTopic] = useState('');
+  const [sourceMedium, setSourceMedium] = useState('');
+  const [statementText, setStatementText] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,18 +44,6 @@ export default function AudytorPage() {
       setCopiedVariantIndex(index);
       setTimeout(() => setCopiedVariantIndex(null), 3000);
     }
-  };
-
-  const handleSelectPreset = (c: (typeof PRESET_CASES)[0]) => {
-    setOfficialName(c.officialName);
-    setRoleTitle(c.roleTitle);
-    setMinistryCode(c.ministryCode);
-    setCoalitionParty(c.coalitionParty);
-    setTopic(c.topic);
-    setSourceMedium(c.sourceMedium);
-    setStatementText(c.statementText);
-    setAuditResult(null);
-    setError(null);
   };
 
   const handleRunAudit = async (e: React.FormEvent) => {
@@ -168,30 +120,13 @@ export default function AudytorPage() {
 
           <div className="flex items-center space-x-2">
             <span className="text-xs font-mono text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
-              Czas analizy: ~1.2s
+              Czas analizy: zależny od źródła
             </span>
           </div>
         </div>
       </div>
 
-      {/* Preset fast-load chips */}
-      <div className="space-y-2">
-        <div className="text-xs font-mono uppercase tracking-wider text-slate-400">
-          Szybkie ładowanie bieżących spraw spornych:
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {PRESET_CASES.map((c, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleSelectPreset(c)}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-700 transition-all text-left"
-            >
-              {c.title}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">Brak gotowych przypadków demonstracyjnych. Wprowadź materiał pochodzący ze zweryfikowanego źródła.</div>
 
       {/* Main Grid: Input Form vs Results */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

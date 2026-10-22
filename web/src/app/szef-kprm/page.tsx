@@ -16,48 +16,6 @@ interface LegislativeDraftCheck {
 }
 
 const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [];
-/*
-  {
-    id: 'leg-01',
-    rclNumber: 'UD-142',
-    title: 'Projekt ustawy o zmianie ustawy o świadczeniach opieki zdrowotnej finansowanych ze środków publicznych (Składka zdrowotna)',
-    applicantMinistry: 'MRiT / PSL',
-    applicantMinister: 'Krzysztof Paszyk',
-    skrmApprovalStatus: 'BALON_PROBNY',
-    fiscalImpactAssessment: 'BRAK_ZGODNY_MF',
-    notes: 'Projekt ogłoszony medialnie przed przekazaniem do uzgodnień międzyresortowych. Sprzeczność z limitami deficytu MF.',
-  },
-  {
-    id: 'leg-02',
-    rclNumber: 'UD-189',
-    title: 'Projekt ustawy o wsparciu kredytobiorców na rynku mieszkaniowym (Program Kredyt na start)',
-    applicantMinistry: 'MRiT',
-    applicantMinister: 'Krzysztof Paszyk',
-    skrmApprovalStatus: 'BLOKADA_SKRM',
-    fiscalImpactAssessment: 'WYMAGA_KONSULTACJI',
-    notes: 'Weto koalicyjne ze strony MFiPR (Polska 2050) i Lewicy. Skierowano do zespołu roboczego SKRM.',
-  },
-  {
-    id: 'leg-03',
-    rclNumber: 'UD-98',
-    title: 'Projekt ustawy o zmianie ustawy o Krajowej Radzie Sądownictwa (Praworządność)',
-    applicantMinistry: 'MS',
-    applicantMinister: 'Waldemar Żurek',
-    skrmApprovalStatus: 'UZGODNIONE',
-    fiscalImpactAssessment: 'POZYTYWNA_MF',
-    notes: 'Pełna zgodność z harmonogramem rządu i kamieniami milowymi KPO. Zgoda Komitetu do Spraw Europejskich.',
-  },
-  {
-    id: 'leg-04',
-    rclNumber: 'UD-215',
-    title: 'Projekt ustawy o finansowaniu strategicznych inwestycji obronnych (Tarcza Wschód)',
-    applicantMinistry: 'MON',
-    applicantMinister: 'Władysław Kosiniak-Kamysz',
-    skrmApprovalStatus: 'UZGODNIONE',
-    fiscalImpactAssessment: 'POZYTYWNA_MF',
-    notes: 'Priorytet rządowy KPRM. Kontrasygnata MF i MON, przyspieszony tryb legislacyjny.',
-  },
-]; */
 
 export default function SzefKprmPage() {
   const [ministries, setMinistries] = useState<MinistryItem[]>([]);

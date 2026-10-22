@@ -8,19 +8,14 @@ import ResortyPage from '../app/resorty/page';
 import PremierPulpitPage from '../app/premier/page';
 
 describe('Executive Briefing & Command Palette Modules', () => {
-  it('renders ExecutiveBriefingModal with key priorities and prime minister riposte', () => {
+  it('renders ExecutiveBriefingModal with a verified-data empty state', () => {
     const handleClose = vi.fn();
     render(<ExecutiveBriefingModal isOpen={true} onClose={handleClose} />);
 
-    expect(screen.getByText(/Poranna odprawa strategiczna Prezesa Rady Ministrów/)).toBeDefined();
-    expect(screen.getByText(/Składka zdrowotna \(MF vs PSL\)/)).toBeDefined();
-    expect(screen.getByText(/Tarcza Wschód i granica/)).toBeDefined();
-    expect(screen.getByText(/Większość rządowa w Sejmie X kadencji/)).toBeDefined();
-    expect(screen.getByText(/Obowiązująca riposta Donalda Tuska do kamer/)).toBeDefined();
-    expect(screen.getByText(/Drukuj teczkę A4/)).toBeDefined();
+    expect(screen.getByText(/Brak danych do odprawy gabinetowej/)).toBeDefined();
 
     // Trigger close via button
-    fireEvent.click(screen.getByText(/Zamknij \[Esc\]/));
+    fireEvent.click(screen.getByText('Zamknij'));
     expect(handleClose).toHaveBeenCalled();
   });
 
@@ -28,16 +23,15 @@ describe('Executive Briefing & Command Palette Modules', () => {
     const handleClose = vi.fn();
     render(<CommandPalette isOpen={true} onClose={handleClose} />);
 
-    expect(screen.getByPlaceholderText(/Szukaj polityka, resortu, tematu sporu/)).toBeDefined();
-    expect(screen.getByText('Donald Tusk')).toBeDefined();
-    expect(screen.getByText('Andrzej Domański')).toBeDefined();
+    expect(screen.getByPlaceholderText(/Szukaj modułu/)).toBeDefined();
+    expect(screen.getByText('Radar KPRM')).toBeDefined();
+    expect(screen.getByText('Przegląd resortów')).toBeDefined();
 
     // Search for a specific policy or politician
-    const searchInput = screen.getByPlaceholderText(/Szukaj polityka, resortu, tematu sporu/);
-    fireEvent.change(searchInput, { target: { value: 'składk' } });
+    const searchInput = screen.getByPlaceholderText(/Szukaj modułu/);
+    fireEvent.change(searchInput, { target: { value: 'alert' } });
 
-    expect(screen.getByText('Składka zdrowotna dla przedsiębiorców')).toBeDefined();
-    expect(screen.getByText('Projekt UD124: Obniżenie składki zdrowotnej')).toBeDefined();
+    expect(screen.getByText('Centrum alertów')).toBeDefined();
   });
 
   it('renders MobileExecutiveDock for tablet/iPad and triggers actions', () => {
@@ -75,13 +69,10 @@ describe('Executive Briefing & Command Palette Modules', () => {
     expect(screen.getByText(/Brak zweryfikowanych projektów z RCL/)).toBeDefined();
   });
 
-  it('renders PremierPulpitPage with presidential veto radar and session decision log', () => {
+  it('renders PremierPulpitPage with a verified-data empty state', () => {
     render(<PremierPulpitPage />);
 
     expect(screen.getByText(/Pulpit Prezesa Rady Ministrów/)).toBeDefined();
-    expect(screen.getByText(/Wskaźnik ryzyka weta prezydenckiego i wniosków do TK/i)).toBeDefined();
-    expect(screen.getByText(/Dziennik podjętych dyspozycji gabinetu/i)).toBeDefined();
-    expect(screen.getByText(/Centrum Informacyjne Rządu \(CIR\)/)).toBeDefined();
-    expect(screen.getByText(/Stały Komitet Rady Ministrów \(SKRM\)/)).toBeDefined();
+    expect(screen.getByText(/Brak zweryfikowanego meldunku dla premiera/)).toBeDefined();
   });
 });

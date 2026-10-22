@@ -3,46 +3,26 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MetricCard } from '../components/MetricCard';
 import { ConflictCard } from '../components/ConflictCard';
-import { OFFICIAL_MINISTRIES } from '../lib/constants';
 import { NarrativeConflictItem } from '../types';
 
 describe('GOVscope Operational Frontend', () => {
-  it('covers all Polish ministries and central bodies with coalition mapping', () => {
-    expect(OFFICIAL_MINISTRIES.length).toBe(23);
-    const codes = OFFICIAL_MINISTRIES.map((m) => m.code);
-    expect(codes).toContain('KPRM');
-    expect(codes).toContain('MF');
-    expect(codes).toContain('MSZ');
-    expect(codes).toContain('MON');
-    expect(codes).toContain('MSWiA');
-    expect(codes).toContain('MS');
-    expect(codes).toContain('MAP');
-    expect(codes).toContain('MRiT');
-    expect(codes).toContain('ME');
-    expect(codes).toContain('MKiŚ');
-    expect(codes).toContain('MRPiPS');
-    expect(codes).toContain('MZ');
-    expect(codes).toContain('MEN');
-    expect(codes).toContain('M_UE');
-  });
-
   it('renders MetricCard with proper values', () => {
     render(
       <MetricCard
         label="Indeks spójności rządu"
-        value="89.4%"
-        subtext="-1.2 pkt w ciągu 24h"
-        trend="positive"
+        value="Brak danych"
+        subtext="Brak zweryfikowanej podstawy"
+        trend="neutral"
       />
     );
 
     expect(screen.getByText('Indeks spójności rządu')).toBeDefined();
-    expect(screen.getByText('89.4%')).toBeDefined();
-    expect(screen.getByText('-1.2 pkt w ciągu 24h')).toBeDefined();
+    expect(screen.getByText('Brak danych')).toBeDefined();
+    expect(screen.getByText('Brak zweryfikowanej podstawy')).toBeDefined();
   });
 
   it('renders ConflictCard with P1_CRITICAL status and quotation clash', () => {
-    const mockConflict: NarrativeConflictItem = {
+    const fixtureConflict: NarrativeConflictItem = {
       id: 'test-conf-1',
       conflictType: 'NAPIĘCIE_KOALICYJNE',
       severity: 'P1_CRITICAL',
@@ -76,7 +56,7 @@ describe('GOVscope Operational Frontend', () => {
       recommendedAction: 'Pilne spotkanie w KPRM.',
     };
 
-    render(<ConflictCard conflict={mockConflict} />);
+    render(<ConflictCard conflict={fixtureConflict} />);
     expect(screen.getByText('Spór o składkę zdrowotną')).toBeDefined();
     expect(screen.getByText('P1 CRITICAL')).toBeDefined();
     expect(screen.getByText(/Brak środków na dalsze cięcia/)).toBeDefined();
