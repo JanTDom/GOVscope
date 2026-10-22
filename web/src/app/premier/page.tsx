@@ -222,7 +222,7 @@ export default function PremierPulpitPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Stan spójności rządu</div>
-          <div className="text-3xl font-extrabold text-white font-mono">89.4%</div>
+          <div className="text-3xl font-extrabold text-white font-mono">Brak danych</div>
           <div className="text-[11px] text-emerald-400 font-mono">Większość sejmowa: 248 posłów</div>
         </div>
 

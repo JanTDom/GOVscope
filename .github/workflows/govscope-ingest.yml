@@ -22,3 +22,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.GOVSCOPE_DATABASE_URL }}
         run: python -m ingest.live
+      - name: Refresh active government roster
+        env:
+          DATABASE_URL: ${{ secrets.GOVSCOPE_DATABASE_URL }}
+        run: python -m ingest.administration

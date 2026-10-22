@@ -20,7 +20,8 @@ interface LegislativeInitiative {
   presidentialVetoNote: string;
 }
 
-const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
+const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [];
+/*
   {
     id: 'UD124',
     title: 'Ustawa o zmianie zasad naliczania składki zdrowotnej dla przedsiębiorców',
@@ -111,7 +112,7 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [
     presidentialVetoRisk: 'BARDZO_WYSOKIE',
     presidentialVetoNote: 'Prezydent Andrzej Duda wielokrotnie deklarował obronę ustawy o ograniczeniu handlu w niedziele. Ustawa w obecnym kształcie nie ma szans na podpis.',
   },
-];
+]; */
 
 export default function ResortyPage() {
   const [ministries, setMinistries] = useState<MinistryItem[]>([]);
@@ -216,7 +217,7 @@ export default function ResortyPage() {
           >
             <span>Dyscyplina RCL</span>
             <span className="px-1.5 py-0.2 rounded-full bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-bold">
-              3 balony
+              {LEGISLATIVE_INITIATIVES.filter((item) => item.kprmStatus === 'BALON_PROBNY').length} balonów
             </span>
           </button>
         </div>
@@ -403,32 +404,32 @@ export default function ResortyPage() {
               <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
                 Wskaźnik dyscypliny RCL
               </span>
-              <div className="text-2xl font-bold font-mono text-emerald-400">67%</div>
-              <span className="text-xs text-slate-400">4 z 6 projektów uzgodnione w KPRM</span>
+              <div className="text-2xl font-bold font-mono text-slate-300">Brak danych</div>
+              <span className="text-xs text-slate-400">Oczekiwanie na zweryfikowany wykaz RCL</span>
             </div>
 
             <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-4 space-y-1">
               <span className="text-[11px] font-mono uppercase tracking-wider text-rose-400 font-semibold">
                 Balony próbne bez zgody
               </span>
-              <div className="text-2xl font-bold font-mono text-rose-400">3 projekty</div>
-              <span className="text-xs text-rose-300">Wymagają interwencji Premiera i SKRM</span>
+              <div className="text-2xl font-bold font-mono text-rose-300">0</div>
+              <span className="text-xs text-slate-400">Brak zweryfikowanych projektów</span>
             </div>
 
             <div className="rounded-xl border border-amber-900/50 bg-amber-950/20 p-4 space-y-1">
               <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400">
                 W toku uzgodnień SKRM
               </span>
-              <div className="text-2xl font-bold font-mono text-amber-400">1 projekt</div>
-              <span className="text-xs text-slate-400">Weryfikacja OSR i zgodności z KPO</span>
+              <div className="text-2xl font-bold font-mono text-amber-300">0</div>
+              <span className="text-xs text-slate-400">Brak zweryfikowanych uzgodnień</span>
             </div>
 
             <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
               <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
                 Autoryzowane w koalicji
               </span>
-              <div className="text-2xl font-bold font-mono text-white">2 projekty</div>
-              <span className="text-xs text-emerald-400">Zgodne z expose i umową koalicyjną</span>
+              <div className="text-2xl font-bold font-mono text-white">{filteredLegislation.length}</div>
+              <span className="text-xs text-slate-400">Zweryfikowane projekty z RCL</span>
             </div>
           </div>
 
@@ -483,6 +484,11 @@ export default function ResortyPage() {
 
           {/* Legislative Initiatives List */}
           <div className="space-y-4">
+            {filteredLegislation.length === 0 && (
+              <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-sm text-slate-400">
+                Brak zweryfikowanych projektów z RCL. W tym widoku nie są prezentowane dane przykładowe.
+              </div>
+            )}
             {filteredLegislation.map((item) => {
               const isTrial = item.kprmStatus === 'BALON_PROBNY';
               return (

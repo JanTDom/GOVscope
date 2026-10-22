@@ -87,7 +87,7 @@ export default function MeldunekPage() {
         <div className="space-y-6">
           <div>
             <h2 className="text-xs font-mono uppercase tracking-widest text-amber-400 print:text-black font-bold mb-2">
-              1. Zwięzła ocena spójności dobowej (Wskaźnik KPRM: 89.4%)
+              1. Zwięzła ocena spójności dobowej (wyłącznie na podstawie zweryfikowanych danych)
             </h2>
             <div className="p-4 rounded-xl bg-slate-950/80 print:bg-neutral-50 border border-slate-800 print:border-neutral-300 text-sm leading-relaxed text-slate-200 print:text-black space-y-2">
               <p>

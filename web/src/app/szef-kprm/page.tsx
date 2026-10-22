@@ -15,7 +15,8 @@ interface LegislativeDraftCheck {
   notes: string;
 }
 
-const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [
+const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [];
+/*
   {
     id: 'leg-01',
     rclNumber: 'UD-142',
@@ -56,7 +57,7 @@ const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [
     fiscalImpactAssessment: 'POZYTYWNA_MF',
     notes: 'Priorytet rządowy KPRM. Kontrasygnata MF i MON, przyspieszony tryb legislacyjny.',
   },
-];
+]; */
 
 export default function SzefKprmPage() {
   const [ministries, setMinistries] = useState<MinistryItem[]>([]);
@@ -119,26 +120,26 @@ export default function SzefKprmPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Projekty w wykazie prac</div>
-          <div className="text-3xl font-extrabold text-white font-mono">148</div>
+          <div className="text-3xl font-extrabold text-white font-mono">{drafts.length}</div>
           <div className="text-[11px] text-slate-400 font-mono">Zarejestrowane druki rządowe</div>
         </div>
 
         <div className="rounded-xl border border-rose-900/60 bg-rose-950/20 p-4 space-y-1">
           <div className="text-xs font-mono text-rose-300">Balony próbne bez zgody SKRM</div>
-          <div className="text-3xl font-extrabold text-rose-400 font-mono">2 projekty</div>
+          <div className="text-3xl font-extrabold text-rose-400 font-mono">{drafts.filter((draft) => draft.skrmApprovalStatus === 'BALON_PROBNY').length}</div>
           <div className="text-[11px] text-rose-300 font-mono">Wstrzymano bieg legislacyjny</div>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Pozytywna opinia MF</div>
-          <div className="text-3xl font-extrabold text-emerald-400 font-mono">82%</div>
-          <div className="text-[11px] text-slate-400 font-mono">Zgodność z dyscypliną budżetową</div>
+          <div className="text-3xl font-extrabold text-slate-300 font-mono">Brak danych</div>
+          <div className="text-[11px] text-slate-400 font-mono">Brak zweryfikowanego wykazu RCL</div>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Najbliższy Stały Komitet</div>
-          <div className="text-2xl font-bold text-amber-400 font-mono">Czwartek 10:00</div>
-          <div className="text-[11px] text-slate-400 font-mono">Porządek: 12 punktów</div>
+          <div className="text-2xl font-bold text-slate-300 font-mono">Brak danych</div>
+          <div className="text-[11px] text-slate-400 font-mono">Brak zweryfikowanego kalendarza SKRM</div>
         </div>
       </div>
 
@@ -201,6 +202,11 @@ export default function SzefKprmPage() {
 
         {/* Drafts Feed */}
         <div className="space-y-4">
+          {filteredDrafts.length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-sm text-slate-400">
+              Brak zweryfikowanych projektów legislacyjnych. Dane przykładowe są wyłączone.
+            </div>
+          )}
           {filteredDrafts.map((d) => (
             <div
               key={d.id}

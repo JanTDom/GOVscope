@@ -71,9 +71,8 @@ describe('Executive Briefing & Command Palette Modules', () => {
 
     expect(screen.getByText('Dyscyplina legislacyjna i wykaz prac rządu (RCL)')).toBeDefined();
     expect(screen.getByText('Wskaźnik dyscypliny RCL')).toBeDefined();
-    expect(screen.getByText(/67%/)).toBeDefined();
-    expect(screen.getAllByText(/Ryzyko weta prezydenckiego \/ TK/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/RYZYKO: KRYTYCZNE/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Brak danych/)).toBeDefined();
+    expect(screen.getByText(/Brak zweryfikowanych projektów z RCL/)).toBeDefined();
   });
 
   it('renders PremierPulpitPage with presidential veto radar and session decision log', () => {

@@ -14,6 +14,7 @@ from govscope.models.entities import (
 from ingest.connectors.govpl import GovPlCollector
 from ingest.connectors.rcl import WykazPracCollector
 from ingest.engine import AsyncIngestEngine, RateLimiter
+from ingest.administration import parse_roster
 from ingest.seed import (
     get_reference_ministries,
     get_reference_officials,
@@ -88,6 +89,21 @@ def test_govpl_rss_parsing():
     assert st1.ministry_id == ministry_id
     assert st1.official_id == official_id
     assert st1.source_url == "https://www.gov.pl/web/premier/posiedzenie-rm-budzet"
+
+
+def test_current_government_roster_parser_is_source_bound():
+    html = """
+    <div class="title"><a href="/web/premier/milosz-motyka"> Miłosz Motyka </a></div>
+    <div class="position">Minister Energii </div>
+    <div class="title"><a href="/web/premier/stefan-krajewski"> Stefan Krajewski </a></div>
+    <div class="position">Minister Rolnictwa i Rozwoju Wsi </div>
+    """
+    officials = parse_roster(html)
+    assert [(item.full_name, item.ministry_code) for item in officials] == [
+        ("Miłosz Motyka", "ME"),
+        ("Stefan Krajewski", "MRiRW"),
+    ]
+    assert parse_roster("<html>upstream changed</html>") == []
 
 
 def test_wykaz_prac_legislative_parsing():

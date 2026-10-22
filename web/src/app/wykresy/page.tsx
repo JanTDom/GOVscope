@@ -90,7 +90,7 @@ export default function WykresyPage() {
             Zagregowana Spójność Rządu
           </div>
           <div className="text-3xl font-extrabold text-emerald-400 mt-1 font-mono">
-            89.4%
+            Brak danych
           </div>
           <div className="text-xs text-emerald-500 font-medium mt-1 flex items-center space-x-1">
             <span>↑ +1.2% w tym tygodniu</span>
@@ -1171,7 +1171,7 @@ export default function WykresyPage() {
                 <h3 className="text-base font-extrabold text-white">Zagregowany Indeks Zdrowia Rządu (GHI)</h3>
               </div>
               <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
-                89.4 / 100 pkt
+                Brak zweryfikowanego wyniku
               </span>
             </div>
             <div className="h-44 flex flex-col justify-end">
