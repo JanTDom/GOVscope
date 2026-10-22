@@ -30,7 +30,7 @@ class PublicSource:
 
 
 DEFAULT_SOURCES: tuple[PublicSource, ...] = (
-    PublicSource("sejm_api", "API Sejmu", "JSON_API", "https://api.sejm.gov.pl/sejm/10/prints"),
+    PublicSource("sejm_api", "API Sejmu", "JSON_API", "https://api.sejm.gov.pl/sejm/term10/prints"),
     PublicSource("sejm_eli_api", "ELI / akty prawne", "JSON_API", "https://api.sejm.gov.pl/eli/acts"),
     PublicSource("rcl_wpl_rm", "Wykaz prac legislacyjnych RM", "HTML", "https://www.gov.pl/web/premier/wplip-rm"),
     PublicSource("rcl_wpl_prm", "Wykaz prac legislacyjnych PRM", "HTML", "https://www.gov.pl/web/premier/wpl-prm"),
