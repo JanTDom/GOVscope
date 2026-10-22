@@ -18,9 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl">
-      <body className="bg-slate-950 text-slate-100 antialiased min-h-screen">
+      <body className="min-h-screen bg-[#07111f] text-slate-100 antialiased selection:bg-amber-300 selection:text-slate-950">
         <Header />
-        <main className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 lg:pb-8">
+        <main className="mx-auto max-w-[1440px] px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:py-8 lg:pb-10">
           {children}
         </main>
       </body>

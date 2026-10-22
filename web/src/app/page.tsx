@@ -31,18 +31,18 @@ export default function RadarKPRMPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       {/* Top Banner & Fast Actions */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-800 pb-6 gap-6">
+      <div className="flex flex-col gap-7 rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-900/90 to-slate-950/60 p-6 shadow-xl shadow-slate-950/20 lg:flex-row lg:items-end lg:justify-between lg:p-8">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono text-amber-400 uppercase tracking-wider mb-2">
+          <div className="mb-3 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-300">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Kancelaria Prezesa Rady Ministrów • Stanowisko Dowodzenia</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+          <h1 className="max-w-4xl text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             Radar KPRM — centrum wczesnego ostrzegania i spójności rządu
           </h1>
-          <p className="mt-1 text-sm text-slate-400 max-w-3xl">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
             Ciągły monitoring wypowiedzi ministrów, inicjatyw legislacyjnych RCL oraz wykrywanie kolizji z linią Prezesa Rady Ministrów.
           </p>
         </div>
@@ -51,13 +51,13 @@ export default function RadarKPRMPage() {
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/audytor"
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-blue-600/20 border border-blue-400/30 flex items-center space-x-2"
+            className="flex items-center space-x-2 rounded-xl border border-blue-400/30 bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500"
           >
             <span>Audytor AI Gemini</span>
           </Link>
           <Link
             href="/meldunek"
-            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20"
+            className="rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-semibold text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:bg-amber-300"
           >
             <span>Meldunek dla premiera</span>
           </Link>
@@ -65,7 +65,7 @@ export default function RadarKPRMPage() {
       </div>
 
       {/* KPI Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         <MetricCard
           label="Indeks spójności rządu"
           value={`${metrics.overallCohesionIndex}%`}

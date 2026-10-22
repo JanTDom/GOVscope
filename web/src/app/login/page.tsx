@@ -1,192 +1,54 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const rawRedirect = searchParams.get('redirect') || '/';
-  const redirectTarget =
-    rawRedirect && rawRedirect !== '/login' && !rawRedirect.startsWith('/login')
-      ? rawRedirect
-      : '/';
-
+  const redirectTarget = rawRedirect && rawRedirect !== '/login' && !rawRedirect.startsWith('/login') ? rawRedirect : '/';
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // If already authenticated via cookie in browser, automatically redirect to dashboard
-  useEffect(() => {
-    if (typeof document !== 'undefined' && document.cookie.includes('govscope_session=authenticated_pdt_kprm_2026')) {
-      window.location.href = redirectTarget;
-    }
-  }, [redirectTarget]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     const cleanPassword = password.trim();
-    if (!cleanPassword) {
-      setError('Wprowadź hasło dostępu.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
+    if (!cleanPassword) { setError('Wprowadź hasło dostępu.'); return; }
+    setLoading(true); setError(null);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: cleanPassword }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Nieprawidłowe hasło dostępu.');
-        setLoading(false);
-        return;
-      }
-
-      // Client-side cookie fallback to guarantee persistence across all browsers/webviews
-      try {
-        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
-        document.cookie = `govscope_session=authenticated_pdt_kprm_2026; path=/; max-age=604800; samesite=lax${isHttps ? '; secure' : ''}`;
-      } catch {
-        // ignore
-      }
-
-      // Hard document navigation ensures cookies are sent fresh in request headers to bypass App Router cache
+      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: cleanPassword }), cache: 'no-store' });
+      const data = await response.json() as { error?: string };
+      if (!response.ok) { setError(data.error || 'Nieprawidłowe hasło dostępu.'); setLoading(false); return; }
       window.location.href = redirectTarget;
-    } catch {
-      setError('Błąd połączenia z serwerem uwierzytelniania KPRM.');
-      setLoading(false);
-    }
+    } catch { setError('Błąd połączenia z serwerem uwierzytelniania KPRM.'); setLoading(false); }
   };
 
   return (
-    <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 backdrop-blur-xl p-8 shadow-2xl shadow-black/60 relative">
-      <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2 font-mono"
-          >
-            Hasło dostępu do systemu
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              required
-              autoFocus
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Wprowadź hasło autoryzacyjne..."
-              className="w-full rounded-lg border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono transition-all"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-slate-200 font-mono"
-            >
-              {showPassword ? 'Ukryj' : 'Pokaż'}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="rounded-lg bg-rose-950/60 border border-rose-800/80 p-3 text-xs text-rose-300 flex items-start space-x-2">
-            <span className="font-bold font-mono">BŁĄD:</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 hover:from-blue-600 hover:to-indigo-500 text-white font-medium py-3 px-4 text-sm transition-all shadow-lg shadow-blue-900/30 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-500/30 font-mono"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center space-x-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Weryfikacja uprawnień...</span>
-            </span>
-          ) : (
-            'Zaloguj do Centrum Dowodzenia'
-          )}
-        </button>
+    <div className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-6 shadow-xl shadow-black/20 sm:p-8">
+      <div className="mb-8"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Dostęp operacyjny</p><h2 className="mt-3 text-2xl font-semibold text-white">Zaloguj się do GOVscope</h2><p className="mt-2 text-sm leading-6 text-slate-400">Wprowadź hasło, aby otworzyć pulpit monitoringu KPRM.</p></div>
+      <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
+        <div><label htmlFor="password" className="mb-2 block text-xs font-medium text-slate-300">Hasło dostępu</label><div className="relative"><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required autoFocus value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Wprowadź hasło" className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3.5 pr-20 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20" /><button type="button" onClick={() => setShowPassword((shown) => !shown)} className="absolute inset-y-0 right-0 px-4 text-xs text-slate-400 hover:text-white">{showPassword ? 'Ukryj' : 'Pokaż'}</button></div></div>
+        {error && <div role="alert" className="rounded-xl border border-rose-800/70 bg-rose-950/40 p-3 text-sm text-rose-200"><span className="font-semibold">Logowanie nieudane. </span>{error}</div>}
+        <button type="submit" disabled={loading} className="flex w-full items-center justify-center rounded-xl bg-amber-400 px-4 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/10 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Sprawdzanie dostępu…' : 'Otwórz pulpit'}</button>
       </form>
-
-      {/* Security Notice */}
-      <div className="mt-6 pt-5 border-t border-slate-800/80 text-[11px] text-slate-500 text-center leading-relaxed">
-        <span className="font-semibold text-slate-400">Klauzula bezpieczeństwa:</span> System
-        przeznaczony wyłącznie dla Prezesa Rady Ministrów, członków rządu oraz wyznaczonych
-        doradców KPRM. Wszystkie próby nieautoryzowanego dostępu są rejestrowane.
-      </div>
+      <div className="mt-7 border-t border-slate-800 pt-5 text-xs leading-5 text-slate-500">Sesja jest tymczasowa. Dostęp nie jest zapisywany na urządzeniu przez aplikację.</div>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black opacity-80 pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[350px] bg-gradient-to-b from-blue-900/10 via-amber-500/5 to-transparent blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 w-full max-w-md">
-        {/* Official Header & Large Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <div className="relative p-2 rounded-2xl bg-gradient-to-b from-slate-800/80 to-slate-900/90 border border-slate-700/60 shadow-2xl shadow-black/80">
-              <Image
-                src="/govscope-logo-dark.png"
-                alt="GOVscope Logo"
-                width={360}
-                height={150}
-                className="h-16 sm:h-20 w-auto object-contain"
-                priority
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-800 text-[11px] font-mono uppercase tracking-widest text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              <span>Kancelaria Prezesa Rady Ministrów</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white pt-2">
-              Centrum Dowodzenia KPRM
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-400">
-              System Wczesnego Ostrzegania i Spójności Rządowej
-            </p>
-          </div>
-        </div>
-
-        {/* Authentication Card in Suspense */}
-        <Suspense
-          fallback={
-            <div className="rounded-2xl border border-slate-800/90 bg-slate-900/80 p-8 text-center text-xs font-mono text-slate-400">
-              Ładowanie modułu uwierzytelniania...
-            </div>
-          }
-        >
-          <LoginForm />
-        </Suspense>
-
-        {/* Footer info */}
-        <div className="mt-8 text-center text-[11px] font-mono text-slate-500 space-y-1">
-          <div>GOVscope v2.4 • Kancelaria Prezesa Rady Ministrów</div>
-          <div>Al. Ujazdowskie 1/3, 00-583 Warszawa</div>
-        </div>
+    <div className="relative flex min-h-[calc(100vh-2rem)] items-center overflow-hidden bg-[#07111f] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(30,64,175,0.24),transparent_35%),radial-gradient(circle_at_90%_80%,rgba(245,158,11,0.09),transparent_30%)]" />
+      <div className="relative z-10 mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-700/70 bg-slate-900/80 shadow-2xl shadow-black/50 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="flex flex-col justify-between border-b border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/50 p-8 sm:p-12 lg:border-b-0 lg:border-r">
+          <div><div className="mb-10 inline-flex rounded-2xl border border-slate-700/70 bg-slate-950/50 p-3 shadow-xl"><Image src="/govscope-logo-dark.png" alt="GOVscope" width={300} height={125} className="h-16 w-auto object-contain sm:h-20" priority /></div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">Kancelaria Prezesa Rady Ministrów</p><h1 className="max-w-lg text-3xl font-semibold tracking-tight text-white sm:text-4xl">Centrum dowodzenia spójnością rządu</h1><p className="mt-5 max-w-md text-sm leading-7 text-slate-300">GOVscope łączy monitoring wypowiedzi, prac legislacyjnych i ryzyk europejskich w jeden operacyjny obraz dla KPRM.</p></div>
+          <div className="mt-12 grid grid-cols-2 gap-3 text-xs text-slate-400"><div className="rounded-2xl border border-slate-700/70 bg-slate-950/35 p-4"><span className="mb-2 block h-2 w-2 rounded-full bg-emerald-400" />Monitoring ciągły</div><div className="rounded-2xl border border-slate-700/70 bg-slate-950/35 p-4"><span className="mb-2 block h-2 w-2 rounded-full bg-amber-400" />Analiza eskalacji</div></div>
+        </section>
+        <section className="p-8 sm:p-12"><Suspense fallback={<div className="text-sm text-slate-400">Ładowanie modułu uwierzytelniania…</div>}><LoginForm /></Suspense><p className="mt-5 text-center text-[11px] text-slate-600">GOVscope • dostęp zastrzeżony dla uprawnionych użytkowników KPRM</p></section>
       </div>
     </div>
   );

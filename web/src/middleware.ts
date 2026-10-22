@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const sessionCookie = request.cookies.get('govscope_session');
-  const isAuthenticated = !!(sessionCookie && sessionCookie.value);
+  const isAuthenticated = sessionCookie?.value === 'authenticated_pdt_kprm_2026_v2';
 
   // If already authenticated and trying to visit /login, redirect straight to dashboard
   if (pathname === '/login' && isAuthenticated) {
@@ -25,10 +25,12 @@ export function middleware(request: NextRequest) {
   if (!isAuthenticated) {
     // For API calls, return JSON 401 instead of redirecting to login page
     if (pathname.startsWith('/api/')) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Brak autoryzacji w systemie GOVscope. Wymagane hasło PDT2026.' },
         { status: 401 }
       );
+      response.headers.set('Cache-Control', 'no-store');
+      return response;
     }
 
     const loginUrl = new URL('/login', request.url);
