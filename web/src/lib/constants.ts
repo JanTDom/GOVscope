@@ -32,13 +32,6 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
         xHandle: '@TomaszSiemoniak',
         responsibilities: ['Koordynacja służb specjalnych (ABW, AW, CBA, SKW, SWW)'],
       },
-      {
-        name: 'Maciej Berek',
-        role: 'Przewodniczący SKRM, Minister - Członek RM',
-        party: 'KO',
-        xHandle: '@MaciejBerek',
-        responsibilities: ['Przewodniczenie Stałemu Komitetowi RM', 'Koordynacja procesu legislacyjnego'],
-      },
     ],
   },
   {
@@ -567,8 +560,8 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
   {
     id: '10000000-0000-0000-0000-000000000021',
     code: 'M_SENIOR',
-    namePl: 'Minister do spraw Polityki Senioralnej',
-    shortName: 'MdsPS',
+    namePl: 'Pełnomocnik Rządu do spraw Polityki Senioralnej',
+    shortName: 'Seniorzy',
     coalitionParty: 'KO',
     cohesionScore: 96,
     activeAlertsCount: 0,
@@ -576,7 +569,7 @@ export const OFFICIAL_MINISTRIES: MinistryItem[] = [
     leadership: [
       {
         name: 'Marzena Okła-Drewnowicz',
-        role: 'Minister do spraw Polityki Senioralnej',
+        role: 'Sekretarz Stanu w KPRM, Pełnomocnik Rządu do spraw Polityki Senioralnej',
         party: 'KO',
         xHandle: '@OklaDrewnowicz',
         responsibilities: ['Bon senioralny', 'Długoterminowa opieka senioralna', 'Aktywizacja osób 60+'],

@@ -67,7 +67,7 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
     render(<SzefKprmPage />);
     expect(screen.getAllByText(/Pulpit Szefa KPRM i Przewodniczącego SKRM/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Jan Grabiec/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Maciej Berek/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Brak aktualnego zweryfikowanego wskazania/).length).toBeGreaterThan(0);
   });
 
   it('renders RzecznikPage with CIR media directives', () => {

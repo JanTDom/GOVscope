@@ -42,7 +42,7 @@ export interface MinistryItem {
   namePl: string;
   shortName: string;
   coalitionParty: CoalitionParty;
-  cohesionScore: number; // 0 - 100%
+  cohesionScore: number | null; // 0 - 100%, null when no verified basis exists
   activeAlertsCount: number;
   lastStatementDate: string;
   leadership: MinisterLeadership[];
@@ -79,7 +79,7 @@ export interface NarrativeConflictItem {
 }
 
 export interface SystemMetricSummary {
-  overallCohesionIndex: number;
+  overallCohesionIndex: number | null;
   activeP1Alerts: number;
   activeP2Alerts: number;
   totalMonitoredStatementsToday: number;

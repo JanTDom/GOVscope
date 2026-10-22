@@ -105,7 +105,7 @@ export default function SzefKprmPage() {
           </div>
           <div className="bg-slate-900 border border-slate-800 px-3.5 py-2 rounded-xl text-right">
             <span className="text-slate-400 block text-[10px]">Przewodniczący SKRM:</span>
-            <span className="text-amber-400 font-bold">Maciej Berek</span>
+            <span className="text-slate-400 font-bold">Brak aktualnego zweryfikowanego wskazania</span>
           </div>
         </div>
       </div>
@@ -303,14 +303,14 @@ export default function SzefKprmPage() {
                 <span className="font-mono font-bold text-white text-sm">{m.code}</span>
                 <span
                   className={`font-mono font-bold ${
-                    m.cohesionScore >= 90
+                    m.cohesionScore !== null && m.cohesionScore >= 90
                       ? 'text-emerald-400'
-                      : m.cohesionScore >= 80
+                      : m.cohesionScore !== null && m.cohesionScore >= 80
                       ? 'text-amber-400'
                       : 'text-rose-400'
                   }`}
                 >
-                  {m.cohesionScore}% spójności
+                  {m.cohesionScore === null ? 'Brak danych o spójności' : `${m.cohesionScore}% spójności`}
                 </span>
               </div>
               <div className="text-slate-300 font-medium truncate">{m.namePl}</div>

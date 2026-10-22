@@ -336,7 +336,7 @@ export default function PremierPulpitPage() {
                 Wyślij linię do CIR
               </button>
               <button
-                onClick={() => handleSendDirective('Stały Komitet Rady Ministrów (Maciej Berek)')}
+                onClick={() => handleSendDirective('Stały Komitet Rady Ministrów')}
                 className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors"
               >
                 Skieruj na SKRM

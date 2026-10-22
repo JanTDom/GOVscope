@@ -3,7 +3,7 @@ import type { NarrativeConflictItem, SystemMetricSummary } from '@/types';
 // Production data is read from verified Supabase rows. These typed defaults
 // keep screens renderable while the first ingestion run is pending.
 export const INITIAL_METRICS: SystemMetricSummary = {
-  overallCohesionIndex: 100,
+  overallCohesionIndex: null,
   activeP1Alerts: 0,
   activeP2Alerts: 0,
   totalMonitoredStatementsToday: 0,

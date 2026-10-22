@@ -61,7 +61,9 @@ export async function getLiveMetrics(): Promise<SystemMetricSummary> {
   const day = new Date().toISOString().slice(0, 10);
   const todayStatements = statements.filter((row) => String(row.created_at ?? '').startsWith(day)).length;
   return {
-    overallCohesionIndex: conflicts.length === 0 ? 100 : Math.max(0, 100 - conflicts.length * 2),
+    overallCohesionIndex: conflicts.length === 0 && statements.length === 0
+      ? null
+      : Math.max(0, 100 - conflicts.length * 2),
     activeP1Alerts: alerts.filter((row) => row.priority === 'P1').length,
     activeP2Alerts: alerts.filter((row) => row.priority === 'P2').length,
     totalMonitoredStatementsToday: todayStatements,
@@ -83,7 +85,11 @@ export async function getLiveMinistries(): Promise<MinistryItem[]> {
     namePl: String(row.name_pl),
     shortName: String(row.short_name),
     coalitionParty: String(row.coalition_party ?? 'NON_PARTISAN') as MinistryItem['coalitionParty'],
-    cohesionScore: 100,
+    cohesionScore: conflicts.some((conflict) => Array.isArray(conflict.ministries_involved) && conflict.ministries_involved.includes(String(row.id)))
+      ? 0
+      : statements.some((statement) => statement.ministry_id === row.id)
+        ? 100
+        : null,
     activeAlertsCount: conflicts.filter((conflict) => Array.isArray(conflict.ministries_involved) && conflict.ministries_involved.includes(row.id)).length,
     lastStatementDate: String(statements.find((statement) => statement.ministry_id === row.id)?.published_at ?? ''),
     leadership: officials.filter((official) => official.ministry_id === row.id).map((official) => ({

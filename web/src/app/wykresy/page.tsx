@@ -1143,20 +1143,20 @@ export default function WykresyPage() {
                 <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">Wykres 31 • Sprostowania</span>
                 <h3 className="text-sm font-bold text-white">Skuteczność żądań sprostowań (CIR)</h3>
               </div>
-              <span className="text-xs font-mono text-emerald-400 font-bold">96% publikacji</span>
+                <span className="text-xs font-mono text-slate-400 font-bold">Brak zweryfikowanych danych</span>
             </div>
             <div className="h-44 flex flex-col justify-center space-y-3 font-mono text-xs">
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
                 <span>Żądania sprostowań w trybie Prawa prasowego</span>
-                <strong className="text-white text-base">24 wysłane</strong>
+                <strong className="text-slate-400 text-base">Brak danych</strong>
               </div>
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
                 <span>Opublikowane bez zmian przez redakcje</span>
-                <strong className="text-emerald-400 text-base">23 opublikowane</strong>
+                <strong className="text-slate-400 text-base">Brak danych</strong>
               </div>
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex justify-between items-center">
                 <span>Skierowane na drogę sądową</span>
-                <strong className="text-amber-400 text-base">1 sprawa w toku</strong>
+                <strong className="text-slate-400 text-base">Brak danych</strong>
               </div>
             </div>
           </div>

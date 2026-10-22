@@ -85,9 +85,9 @@ export default function RadarKPRMPage() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         <MetricCard
           label="Indeks spójności rządu"
-          value={`${metrics.overallCohesionIndex}%`}
-          subtext="-1.2 pkt w ciągu 24h"
-          trend="positive"
+          value={metrics.overallCohesionIndex === null ? 'Brak danych' : `${metrics.overallCohesionIndex}%`}
+          subtext={metrics.overallCohesionIndex === null ? 'Brak zweryfikowanej podstawy' : 'Wyliczone z danych źródłowych'}
+          trend="neutral"
         />
         <MetricCard
           label="Alerty krytyczne P1"
@@ -110,7 +110,7 @@ export default function RadarKPRMPage() {
         <MetricCard
           label="Monitorowane resorty"
           value={metrics.monitoredMinistriesCount}
-          subtext="100% administracji i komitetów"
+          subtext="Aktywne jednostki w rejestrze"
           trend="positive"
         />
         <MetricCard
@@ -142,7 +142,7 @@ export default function RadarKPRMPage() {
               <div className="flex items-baseline justify-between">
                 <span className="text-xl font-bold font-mono text-white">{count}</span>
                 <span className="text-[10px] font-mono text-slate-500">
-                  {((count / conflicts.length) * 100).toFixed(0)}%
+                  {conflicts.length > 0 ? `${((count / conflicts.length) * 100).toFixed(0)}%` : '—'}
                 </span>
               </div>
             </div>

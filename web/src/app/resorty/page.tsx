@@ -147,7 +147,8 @@ export default function ResortyPage() {
     }
   };
 
-  const getScoreColor = (score: number) => {
+  const getScoreColor = (score: number | null) => {
+    if (score === null) return 'text-slate-500';
     if (score >= 90) return 'text-emerald-400';
     if (score >= 80) return 'text-amber-400';
     return 'text-red-400';
@@ -278,15 +279,15 @@ export default function ResortyPage() {
                 >
                   <div
                     onClick={() => toggleExpand(m.id)}
-                    className="p-4 cursor-pointer hover:bg-slate-800/40 flex flex-col md:flex-row md:items-center justify-between gap-4 select-none"
+                    className="p-4 cursor-pointer hover:bg-slate-800/40 grid gap-4 select-none md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                   >
-                    <div className="flex items-start md:items-center space-x-3">
+                    <div className="flex min-w-0 items-start md:items-center space-x-3">
                       <span className="font-mono text-sm font-bold bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg text-white min-w-[70px] text-center">
                         {m.code}
                       </span>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-slate-100 text-sm font-sans">{m.namePl}</h3>
+                      <div className="min-w-0">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <h3 className="min-w-0 break-words font-semibold text-slate-100 text-sm font-sans">{m.namePl}</h3>
                           <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${getPartyClass(m.coalitionParty)}`}>
                             {m.coalitionParty}
                           </span>
@@ -299,11 +300,11 @@ export default function ResortyPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-6 text-xs font-mono">
+                    <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-3 text-xs font-mono md:min-w-[610px]">
                       <div className="text-right">
                         <span className="text-slate-400 block text-[11px]">Wskaźnik spójności</span>
                         <span className={`font-bold text-sm ${getScoreColor(m.cohesionScore)}`}>
-                          {m.cohesionScore}%
+                          {m.cohesionScore === null ? 'Brak danych' : `${m.cohesionScore}%`}
                         </span>
                       </div>
 
@@ -332,7 +333,7 @@ export default function ResortyPage() {
 
                       <button
                         type="button"
-                        className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800"
+                        className="w-[108px] shrink-0 text-xs text-slate-400 hover:text-white px-2.5 py-2 rounded-lg bg-slate-950 border border-slate-800"
                       >
                         {isExpanded ? 'Ukryj skład' : 'Pokaż skład'}
                       </button>
