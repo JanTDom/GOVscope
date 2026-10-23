@@ -6,7 +6,8 @@ export type RoleCategory =
   | 'MINISTER'
   | 'WICEMINISTER'
   | 'PELNOMOCNIK'
-  | 'RZECZNIK';
+  | 'RZECZNIK'
+  | 'DYREKTOR_GENERALNY';
 
 export type ConflictType =
   | 'KAKOFONIA_RESORTOWA'
@@ -31,6 +32,7 @@ export type TargetAudience =
 export interface MinisterLeadership {
   name: string;
   role: string;
+  roleCategory: RoleCategory;
   party: CoalitionParty;
   xHandle?: string;
   responsibilities: string[];
@@ -46,6 +48,27 @@ export interface MinistryItem {
   activeAlertsCount: number;
   lastStatementDate: string;
   leadership: MinisterLeadership[];
+}
+
+export type GovernmentActivityKind =
+  | 'OFFICIAL_STATEMENT'
+  | 'PRESS_CONFERENCE'
+  | 'PLANNED_ACTIVITY'
+  | 'MEDIA_COVERAGE';
+
+export interface GovernmentActivity {
+  id: string;
+  kind: GovernmentActivityKind;
+  title: string;
+  summary: string;
+  publishedAt: string;
+  sourceUrl: string;
+  sourceName: string;
+  ministryCode?: string;
+  ministryName?: string;
+  officialName?: string;
+  status?: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+  location?: string;
 }
 
 export interface StatementComparison {

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CoalitionParty, MinistryItem } from '@/types';
+import { CoalitionParty, GovernmentActivity, MinistryItem } from '@/types';
+import { compareLeadership } from '@/lib/live-data';
 
 interface LegislativeInitiative {
   id: string;
@@ -116,6 +117,7 @@ const LEGISLATIVE_INITIATIVES: LegislativeInitiative[] = [];
 
 export default function ResortyPage() {
   const [ministries, setMinistries] = useState<MinistryItem[]>([]);
+  const [activities, setActivities] = useState<GovernmentActivity[]>([]);
   const [activeTab, setActiveTab] = useState<'MINISTRIES' | 'LEGISLATION'>('MINISTRIES');
   const [selectedParty, setSelectedParty] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -123,13 +125,33 @@ export default function ResortyPage() {
   const [legislationFilter, setLegislationFilter] = useState<'ALL' | 'BALON_PROBNY' | 'UZGODNIENIA' | 'ZATWIERDZONE'>('ALL');
 
   useEffect(() => {
-    fetch('/api/resorty', { cache: 'no-store' })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Nie udało się pobrać aktualnej obsady');
-        return response.json() as Promise<{ ministries?: MinistryItem[] }>;
-      })
-      .then((payload) => setMinistries(Array.isArray(payload.ministries) ? payload.ministries : []))
-      .catch(() => setMinistries([]));
+    const loadPageData = async () => {
+      const [ministriesResponse, activitiesResponse] = await Promise.all([
+        fetch('/api/resorty', { cache: 'no-store' }),
+        fetch('/api/aktywnosci', { cache: 'no-store' }),
+      ]);
+      if (!ministriesResponse.ok) throw new Error('Nie udało się pobrać aktualnej obsady');
+      if (!activitiesResponse.ok) throw new Error('Nie udało się pobrać aktywności administracji');
+
+      const [ministriesPayload, activitiesPayload] = await Promise.all([
+        ministriesResponse.json() as Promise<{ ministries?: MinistryItem[] }>,
+        activitiesResponse.json() as Promise<{ activities?: GovernmentActivity[] }>,
+      ]);
+      setMinistries(
+        Array.isArray(ministriesPayload.ministries)
+          ? ministriesPayload.ministries.map((ministry) => ({
+            ...ministry,
+            leadership: [...ministry.leadership].sort(compareLeadership),
+          }))
+          : [],
+      );
+      setActivities(Array.isArray(activitiesPayload.activities) ? activitiesPayload.activities : []);
+    };
+
+    loadPageData().catch(() => {
+      setMinistries([]);
+      setActivities([]);
+    });
   }, []);
 
   const getPartyClass = (party: string) => {
@@ -177,6 +199,32 @@ export default function ResortyPage() {
     setExpandedMinistryId((prev) => (prev === id ? null : id));
   };
 
+  const activityLabel = (kind: GovernmentActivity['kind']) => {
+    switch (kind) {
+      case 'PRESS_CONFERENCE':
+        return 'Konferencja';
+      case 'PLANNED_ACTIVITY':
+        return 'Planowana aktywność';
+      case 'MEDIA_COVERAGE':
+        return 'Media';
+      default:
+        return 'Komunikat';
+    }
+  };
+
+  const activityClass = (kind: GovernmentActivity['kind']) => {
+    switch (kind) {
+      case 'PRESS_CONFERENCE':
+        return 'border-amber-800/70 bg-amber-950/20 text-amber-300';
+      case 'PLANNED_ACTIVITY':
+        return 'border-sky-800/70 bg-sky-950/20 text-sky-300';
+      case 'MEDIA_COVERAGE':
+        return 'border-violet-800/70 bg-violet-950/20 text-violet-300';
+      default:
+        return 'border-slate-700 bg-slate-950/70 text-slate-300';
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
@@ -192,7 +240,7 @@ export default function ResortyPage() {
               : 'Dyscyplina legislacyjna i wykaz prac rządu (RCL)'}
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Monitorowanie 19 ministerstw, składu kierownictw oraz weryfikacja inicjatyw z Wykazu prac legislacyjnych rządu (RCL).
+            Monitorowanie bieżącego wykazu ministerstw, składów kierownictw oraz weryfikacja inicjatyw z Wykazu prac legislacyjnych rządu (RCL).
           </p>
         </div>
 
@@ -266,11 +314,72 @@ export default function ResortyPage() {
             </div>
           </div>
 
+          <section className="rounded-xl border border-slate-800 bg-slate-900/80 p-4 sm:p-5 space-y-4" aria-labelledby="administration-activity-heading">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 id="administration-activity-heading" className="text-sm font-semibold text-white font-mono">
+                  Aktywność administracji
+                </h2>
+                <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-400">
+                  Bieżące komunikaty resortów, zapowiedziane wydarzenia oraz materiały medialne. Wpis pojawia się wyłącznie po potwierdzeniu źródła.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wide">
+                <span className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-slate-400">
+                  {activities.filter((activity) => activity.kind === 'OFFICIAL_STATEMENT').length} komunikatów
+                </span>
+                <span className="rounded border border-amber-800/70 bg-amber-950/30 px-2 py-1 text-amber-300">
+                  {activities.filter((activity) => activity.kind === 'PRESS_CONFERENCE').length} konferencji
+                </span>
+                <span className="rounded border border-violet-800/70 bg-violet-950/30 px-2 py-1 text-violet-300">
+                  {activities.filter((activity) => activity.kind === 'MEDIA_COVERAGE').length} materiałów medialnych
+                </span>
+              </div>
+            </div>
+
+            {activities.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/60 p-5 text-xs text-slate-400">
+                Brak zweryfikowanych komunikatów, konferencji i materiałów medialnych. Ingest nie dostarczył jeszcze rekordów dla tego widoku.
+              </div>
+            ) : (
+              <div className="grid gap-3 lg:grid-cols-2">
+                {activities.slice(0, 6).map((activity) => (
+                  <article key={activity.id} className="rounded-lg border border-slate-800 bg-slate-950/60 p-3.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className={`rounded border px-1.5 py-0.5 text-[10px] font-bold ${activityClass(activity.kind)}`}>
+                        {activityLabel(activity.kind)}
+                      </span>
+                      <time className="shrink-0 text-[10px] font-mono text-slate-500" dateTime={activity.publishedAt}>
+                        {new Date(activity.publishedAt).toLocaleString('pl-PL', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </time>
+                    </div>
+                    <h3 className="mt-2 text-sm font-semibold leading-snug text-slate-100">{activity.title}</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-slate-400">{activity.summary}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-mono text-slate-500">
+                      <span>{activity.sourceName}</span>
+                      {activity.ministryCode && <span className="text-slate-600">• {activity.ministryCode}</span>}
+                      {activity.officialName && <span className="text-slate-600">• {activity.officialName}</span>}
+                      <a href={activity.sourceUrl} target="_blank" rel="noreferrer" className="ml-auto text-sky-400 hover:text-sky-300">
+                        Otwórz źródło
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+
           {/* Ministries list with leadership drawers */}
           <div className="space-y-3">
             {filteredMinistries.map((m) => {
               const isExpanded = expandedMinistryId === m.id;
-              const leadMinister = m.leadership[0];
+              const leadership = [...m.leadership].sort(compareLeadership);
+              const leadMinister = leadership[0];
 
               return (
                 <div
@@ -345,7 +454,7 @@ export default function ResortyPage() {
                     <div className="border-t border-slate-800/80 bg-slate-950/70 p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                          Skład kierownictwa resortu ({m.leadership.length} osób)
+                          Skład kierownictwa resortu ({leadership.length} osób)
                         </h4>
                         <span className="text-[11px] font-mono text-slate-500">
                           Aktualizacja wg BIP KPRM
@@ -353,9 +462,9 @@ export default function ResortyPage() {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {m.leadership.map((person, idx) => (
+                        {leadership.map((person) => (
                           <div
-                            key={idx}
+                            key={`${person.roleCategory}-${person.name}`}
                             className="rounded-lg border border-slate-800/80 bg-slate-900/90 p-3 space-y-2 text-xs"
                           >
                             <div className="flex items-start justify-between gap-2">

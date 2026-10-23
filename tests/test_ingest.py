@@ -14,7 +14,7 @@ from govscope.models.entities import (
 from ingest.connectors.govpl import GovPlCollector
 from ingest.connectors.rcl import WykazPracCollector
 from ingest.engine import AsyncIngestEngine, RateLimiter
-from ingest.administration import parse_roster
+from ingest.administration import parse_leadership_page, parse_roster
 from ingest.seed import (
     get_reference_ministries,
     get_reference_officials,
@@ -106,6 +106,23 @@ def test_current_government_roster_parser_is_source_bound():
     assert parse_roster("<html>upstream changed</html>") == []
 
 
+def test_ministry_leadership_parser_keeps_secretaries_and_undersecretaries():
+    html = """
+    <div class="title"><a href="/minister">Krzysztof Gawkowski</a></div>
+    <div class="intro">Wicepremier, Minister cyfryzacji</div>
+    <div class="title"><a href="/secretary">Dariusz Standerski</a></div>
+    <div class="intro">Sekretarz Stanu</div>
+    <div class="title"><a href="/undersecretary">Rafał Rosiński</a></div>
+    <div class="intro">Podsekretarz Stanu</div>
+    """
+    officials = parse_leadership_page(html, "MC")
+    assert [(item.full_name, item.role_category, item.ministry_code) for item in officials] == [
+        ("Krzysztof Gawkowski", "WICEPREMIER", "MC"),
+        ("Dariusz Standerski", "WICEMINISTER", "MC"),
+        ("Rafał Rosiński", "WICEMINISTER", "MC"),
+    ]
+
+
 def test_wykaz_prac_legislative_parsing():
     collector = WykazPracCollector()
     min_id = uuid4()
@@ -140,9 +157,9 @@ def test_deterministic_seed_coverage():
     officials = get_reference_officials()
 
     # 1. Zero exclusion: KPRM + 19 ministries + committees
-    assert len(ministries) == 27
+    assert len(ministries) == 29
     codes = {m.code for m in ministries}
-    expected_core = {"KPRM", "MF", "MSZ", "MON", "MSWiA", "MS", "MAP", "MRiT", "MKiŚ", "MRPiPS", "MZ", "MEN", "MNiSW", "MI", "MRiRW", "MC", "MKiDN", "MSiT", "MP", "M_UE"}
+    expected_core = {"KPRM", "MF", "MSZ", "MON", "MSWiA", "MS", "MAP", "MRiT", "MKiŚ", "MRPiPS", "MZ", "MEN", "MNiSW", "MI", "MRiRW", "MC", "MKiDN", "MSiT", "MP", "ME", "MFiPR", "M_UE"}
     for exp in expected_core:
         assert exp in codes, f"Missing ministry: {exp}"
 
@@ -164,3 +181,11 @@ def test_deterministic_seed_coverage():
     vp_names = {vp.full_name for vp in vice_premiers}
     assert "Władysław Kosiniak-Kamysz" in vp_names
     assert "Krzysztof Gawkowski" in vp_names
+
+    former_ministers = {o.full_name: o for o in officials if o.full_name in {"Adam Szłapka", "Katarzyna Kotula", "Adriana Porowska", "Marzena Okła-Drewnowicz"}}
+    assert set(former_ministers) == {"Adam Szłapka", "Katarzyna Kotula", "Adriana Porowska", "Marzena Okła-Drewnowicz"}
+    assert all(o.role_category == RoleCategory.MINISTER for o in former_ministers.values())
+
+    former_mfipr = {o.full_name: o for o in officials if o.full_name in {"Jan Szyszko", "Katarzyna Pełczyńska-Nałęcz"}}
+    assert set(former_mfipr) == {"Jan Szyszko", "Katarzyna Pełczyńska-Nałęcz"}
+    assert all(not official.is_active for official in former_mfipr.values())

@@ -148,6 +148,25 @@ class LiveIngestionRunner:
                         for record in records:
                             if not record["source_url"]:
                                 continue
+                            is_media_source = source.key.startswith(
+                                ("pap_", "rmf", "tvn", "polsat", "rzecz", "wirtualne")
+                            )
+                            if is_media_source:
+                                result = await connection.execute(
+                                    """INSERT INTO media_coverage
+                                       (outlet_name, article_title, content, published_at, source_url,
+                                        source_key, content_hash, verified, fetched_at)
+                                       VALUES ($1, $2, $3,
+                                               COALESCE(NULLIF($4, '')::timestamptz, NOW()),
+                                               $5, $6, $7, TRUE, NOW())
+                                       ON CONFLICT (source_key, content_hash) DO NOTHING""",
+                                    record["source_name"], record["title"], record["content"],
+                                    record["published_at"], record["source_url"],
+                                    record["source_key"], record["content_hash"],
+                                )
+                                if result.endswith("1"):
+                                    written += 1
+                                continue
                             result = await connection.execute(
                                 """INSERT INTO official_statements
                                    (official_id, ministry_id, source_type, title, content, published_at, source_url,
@@ -157,7 +176,7 @@ class LiveIngestionRunner:
                                    ON CONFLICT (source_key, content_hash) DO NOTHING""",
                                 record["title"], record["content"], record["published_at"], record["source_url"],
                                 record["source_name"], record["source_key"], record["content_hash"],
-                                "MEDIA_INTERVIEW" if source.key.startswith(("pap_", "rmf", "tvn", "polsat", "rzecz", "wirtualne")) else "GOV_PL",
+                                    "GOV_PL",
                             )
                             if result.endswith("1"):
                                 written += 1
