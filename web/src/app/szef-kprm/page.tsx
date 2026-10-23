@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { MinistryItem } from '@/types';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 interface LegislativeDraftCheck {
   id: string;
@@ -280,6 +281,7 @@ export default function SzefKprmPage() {
           ))}
         </div>
       </div>
+      <LiveActivityFeed title="Materiały do bramki legislacyjnej KPRM" />
     </div>
   );
 }
