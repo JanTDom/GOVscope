@@ -711,7 +711,7 @@ export default function ResortyPage() {
           </div>
         </div>
       )}
-      <LiveActivityFeed title="Bieżąca aktywność resortów" />
+      <LiveActivityFeed title="Bieżąca aktywność resortów" defaultFilter="GOVERNMENT" />
     </div>
   );
 }

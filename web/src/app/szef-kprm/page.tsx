@@ -281,7 +281,7 @@ export default function SzefKprmPage() {
           ))}
         </div>
       </div>
-      <LiveActivityFeed title="Materiały do bramki legislacyjnej KPRM" />
+      <LiveActivityFeed title="Materiały do bramki legislacyjnej KPRM" defaultFilter="GOVERNMENT" />
     </div>
   );
 }

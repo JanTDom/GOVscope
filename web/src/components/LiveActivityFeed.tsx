@@ -7,7 +7,10 @@ type LiveActivityFeedProps = {
   title?: string;
   description?: string;
   limit?: number;
+  defaultFilter?: ActivityFilter;
 };
+
+type ActivityFilter = 'ALL' | 'GOVERNMENT' | 'MEDIA' | 'PLANNED';
 
 function activityLabel(kind: GovernmentActivity['kind']): string {
   switch (kind) {
@@ -39,9 +42,11 @@ export function LiveActivityFeed({
   title = 'Ostatnia aktywność rządu i otoczenia medialnego',
   description = 'Materiały pochodzące z potwierdzonych źródeł publicznych. Każdy wpis prowadzi do źródła pierwotnego lub materiału, który został pobrany przez ingest.',
   limit = 12,
+  defaultFilter = 'ALL',
 }: LiveActivityFeedProps) {
   const [activities, setActivities] = useState<GovernmentActivity[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [filter, setFilter] = useState<ActivityFilter>(defaultFilter);
 
   useEffect(() => {
     fetch('/api/aktywnosci', { cache: 'no-store' })
@@ -54,6 +59,13 @@ export function LiveActivityFeed({
       .finally(() => setLoaded(true));
   }, []);
 
+  const filteredActivities = activities.filter((activity) => {
+    if (filter === 'GOVERNMENT') return activity.kind === 'OFFICIAL_STATEMENT' || activity.kind === 'PRESS_CONFERENCE';
+    if (filter === 'MEDIA') return activity.kind === 'MEDIA_COVERAGE';
+    if (filter === 'PLANNED') return activity.kind === 'PLANNED_ACTIVITY';
+    return true;
+  });
+
   return (
     <section className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl" aria-labelledby="live-activity-heading">
       <div className="flex flex-col gap-2 border-b border-slate-800 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -62,19 +74,38 @@ export function LiveActivityFeed({
           <h2 id="live-activity-heading" className="mt-2 text-lg font-semibold text-white">{title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">{description}</p>
         </div>
-        <span className="shrink-0 font-mono text-xs text-slate-500">{loaded ? `${activities.length} wpisów` : 'Pobieranie...'}</span>
+        <span className="shrink-0 font-mono text-xs text-slate-500">{loaded ? `${filteredActivities.length} wpisów` : 'Pobieranie...'}</span>
+      </div>
+
+      <div className="flex flex-wrap gap-2 border-b border-slate-800 py-3" aria-label="Zakres rejestru">
+        {([
+          ['ALL', 'Wszystkie'],
+          ['GOVERNMENT', 'Rząd i resorty'],
+          ['MEDIA', 'Media'],
+          ['PLANNED', 'Terminy'],
+        ] as const).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setFilter(value)}
+            className={`rounded border px-2.5 py-1 text-xs ${filter === value ? 'border-amber-500/70 bg-amber-950/30 text-amber-200' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+            aria-pressed={filter === value}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {!loaded ? (
         <p className="pt-5 text-sm text-slate-500">Odczytuję potwierdzone rekordy.</p>
-      ) : activities.length === 0 ? (
+      ) : filteredActivities.length === 0 ? (
         <div className="pt-5">
-          <p className="text-sm font-medium text-slate-300">Brak potwierdzonych aktywności w rejestrze.</p>
+          <p className="text-sm font-medium text-slate-300">Brak potwierdzonych aktywności w wybranym zakresie.</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">To oznacza brak zapisanego rekordu albo niedostępny cykl ingestu, a nie brak wydarzeń w świecie.</p>
         </div>
       ) : (
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {activities.slice(0, limit).map((activity) => (
+          {filteredActivities.slice(0, limit).map((activity) => (
             <article key={activity.id} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
               <div className="flex items-center justify-between gap-3">
                 <span className={`rounded border px-1.5 py-0.5 text-[10px] font-bold ${activityClass(activity.kind)}`}>
