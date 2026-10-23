@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { INITIAL_CONFLICTS } from '@/lib/store';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 interface AlertItem {
   id: string;
@@ -220,6 +221,7 @@ export default function AlertyPage() {
           ))}
         </div>
       )}
+      <LiveActivityFeed title="Materiały źródłowe dla centrum alertów" />
     </div>
   );
 }

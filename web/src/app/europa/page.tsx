@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import type { NarrativeConflictItem } from '@/types';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 interface InfringementItem { id: string; title: string; directiveRef: string; stage: string; riskLevel: string; deadline: string; impact: string; responsibleMinistry: string; }
 interface KpoMilestone { id: string; code: string; title: string; status: string; quarter: string; ministry: string; }
@@ -240,6 +241,7 @@ export default function EuropaPage() {
           </div>
         </div>
       )}
+      <LiveActivityFeed title="Aktywność rządu związana z wymiarem europejskim" />
     </div>
   );
 }

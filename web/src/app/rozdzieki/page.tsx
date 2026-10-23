@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { INITIAL_CONFLICTS } from '@/lib/store';
 import { ConflictType } from '@/types';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 export default function RozdziekiPage() {
   const [selectedType, setSelectedType] = useState<string>('ALL');
@@ -206,6 +207,7 @@ export default function RozdziekiPage() {
           );
         })}
       </div>
+      <LiveActivityFeed title="Materiały oczekujące na analizę rozdźwięku" />
     </div>
   );
 }

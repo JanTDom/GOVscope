@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CoalitionParty, GovernmentActivity, MinistryItem } from '@/types';
 import { compareLeadership } from '@/lib/live-data';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 interface LegislativeInitiative {
   id: string;
@@ -710,6 +711,7 @@ export default function ResortyPage() {
           </div>
         </div>
       )}
+      <LiveActivityFeed title="Bieżąca aktywność resortów" />
     </div>
   );
 }
