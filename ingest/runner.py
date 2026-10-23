@@ -29,6 +29,7 @@ from ingest.connectors.rcl import WykazPracCollector
 from ingest.connectors.wires import AgencyWireCollector
 from ingest.engine import AsyncIngestEngine
 from ingest.seed import get_reference_ministries, get_reference_officials
+from ingest.live import LiveIngestionRunner
 
 logger = logging.getLogger("govscope.ingest.runner")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -52,6 +53,7 @@ class IngestionPipelineRunner:
         self.wykaz_collector = WykazPracCollector(self.http_engine)
         self.wires_collector = AgencyWireCollector(self.http_engine)
         self.eu_collector = EUSignalsCollector(self.http_engine)
+        self.live_runner = LiveIngestionRunner(self.http_engine)
 
         # In-memory working buffers
         self.stored_statements: List[OfficialStatement] = []
@@ -130,42 +132,15 @@ class IngestionPipelineRunner:
         new_conflicts_count = 0
         p1_alerts_count = 0
 
-        # Sample simulated wires/announcements if running offline
-        now = datetime.now(timezone.utc)
-        kprm = self.ministries.get("KPRM")
-        mf = self.ministries.get("MF")
-        mrit = self.ministries.get("MRiT")
-
-        tusk = next((o for o in self.officials.values() if o.role_category == RoleCategory.PREMIER), None)
-        domanski = next((o for o in self.officials.values() if o.full_name == "Andrzej Domański"), None)
-        paszyk = next((o for o in self.officials.values() if o.full_name == "Krzysztof Paszyk"), None)
-
-        incoming_batch: List[OfficialStatement] = []
-        if kprm and tusk:
-            incoming_batch.append(
-                OfficialStatement(
-                    official_id=tusk.id,
-                    ministry_id=kprm.id,
-                    source_type=self.wires_collector.wires_collector if hasattr(self.wires_collector, 'wires_collector') else stmt_type_fallback(),
-                    title="Oświadczenie Premiera w sprawie dyscypliny budżetowej",
-                    content="Rząd nie dopuści do naruszenia reguły wydatkowej. Każdy projekt musi mieć pokrycie.",
-                    published_at=now,
-                )
-            )
-
-        detected = await self.process_statements(incoming_batch)
-        self.detected_conflicts.extend(detected)
-
-        for a in self.active_alerts:
-            if a.priority == "P1":
-                p1_alerts_count += 1
+        live_result = await self.live_runner.run_once()
 
         summary = {
             "cycle_timestamp": cycle_start.isoformat(),
-            "stored_statements": len(self.stored_statements),
+            "stored_statements": live_result["records_written"],
             "stored_initiatives": len(self.stored_initiatives),
             "total_conflicts_detected": len(self.detected_conflicts),
             "active_p1_alerts": p1_alerts_count,
+            "records_seen": live_result["records_seen"],
             "status": "COMPLETED",
         }
         logger.info("Cycle completed successfully: %s", summary)

@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_CONFLICTS, INITIAL_METRICS } from '@/lib/store';
+import { getLiveConflicts, getLiveMetrics } from '@/lib/live-data';
 
 export async function GET() {
+  const [metrics, conflicts] = await Promise.all([getLiveMetrics(), getLiveConflicts()]);
   return NextResponse.json({
     timestamp: new Date().toISOString(),
-    metrics: INITIAL_METRICS,
-    conflicts: INITIAL_CONFLICTS,
+    metrics,
+    conflicts,
+    dataStatus: 'VERIFIED_SOURCE_DATA',
   });
 }

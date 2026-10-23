@@ -14,6 +14,8 @@ from govscope.models.entities import (
 from ingest.connectors.govpl import GovPlCollector
 from ingest.connectors.rcl import WykazPracCollector
 from ingest.engine import AsyncIngestEngine, RateLimiter
+from ingest.live import parse_rss
+from ingest.administration import parse_leadership_page, parse_roster
 from ingest.seed import (
     get_reference_ministries,
     get_reference_officials,
@@ -90,6 +92,57 @@ def test_govpl_rss_parsing():
     assert st1.source_url == "https://www.gov.pl/web/premier/posiedzenie-rm-budzet"
 
 
+def test_live_rss_parser_supports_atom_link_attributes():
+    atom = """<?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <title>Komunikat o zmianie w rządzie</title>
+        <link href="https://example.org/komunikat" />
+        <summary>Źródłowy materiał do monitoringu.</summary>
+        <updated>2026-10-23T12:00:00+02:00</updated>
+      </entry>
+    </feed>
+    """
+
+    records = parse_rss(atom, "test_atom", "Testowy feed")
+
+    assert len(records) == 1
+    assert records[0]["source_url"] == "https://example.org/komunikat"
+    assert records[0]["title"] == "Komunikat o zmianie w rządzie"
+
+
+def test_current_government_roster_parser_is_source_bound():
+    html = """
+    <div class="title"><a href="/web/premier/milosz-motyka"> Miłosz Motyka </a></div>
+    <div class="position">Minister Energii </div>
+    <div class="title"><a href="/web/premier/stefan-krajewski"> Stefan Krajewski </a></div>
+    <div class="position">Minister Rolnictwa i Rozwoju Wsi </div>
+    """
+    officials = parse_roster(html)
+    assert [(item.full_name, item.ministry_code) for item in officials] == [
+        ("Miłosz Motyka", "ME"),
+        ("Stefan Krajewski", "MRiRW"),
+    ]
+    assert parse_roster("<html>upstream changed</html>") == []
+
+
+def test_ministry_leadership_parser_keeps_secretaries_and_undersecretaries():
+    html = """
+    <div class="title"><a href="/minister">Krzysztof Gawkowski</a></div>
+    <div class="intro">Wicepremier, Minister cyfryzacji</div>
+    <div class="title"><a href="/secretary">Dariusz Standerski</a></div>
+    <div class="intro">Sekretarz Stanu</div>
+    <div class="title"><a href="/undersecretary">Rafał Rosiński</a></div>
+    <div class="intro">Podsekretarz Stanu</div>
+    """
+    officials = parse_leadership_page(html, "MC")
+    assert [(item.full_name, item.role_category, item.ministry_code) for item in officials] == [
+        ("Krzysztof Gawkowski", "WICEPREMIER", "MC"),
+        ("Dariusz Standerski", "WICEMINISTER", "MC"),
+        ("Rafał Rosiński", "WICEMINISTER", "MC"),
+    ]
+
+
 def test_wykaz_prac_legislative_parsing():
     collector = WykazPracCollector()
     min_id = uuid4()
@@ -124,9 +177,9 @@ def test_deterministic_seed_coverage():
     officials = get_reference_officials()
 
     # 1. Zero exclusion: KPRM + 19 ministries + committees
-    assert len(ministries) == 27
+    assert len(ministries) == 29
     codes = {m.code for m in ministries}
-    expected_core = {"KPRM", "MF", "MSZ", "MON", "MSWiA", "MS", "MAP", "MRiT", "MKiŚ", "MRPiPS", "MZ", "MEN", "MNiSW", "MI", "MRiRW", "MC", "MKiDN", "MSiT", "MP", "M_UE"}
+    expected_core = {"KPRM", "MF", "MSZ", "MON", "MSWiA", "MS", "MAP", "MRiT", "MKiŚ", "MRPiPS", "MZ", "MEN", "MNiSW", "MI", "MRiRW", "MC", "MKiDN", "MSiT", "MP", "ME", "MFiPR", "M_UE"}
     for exp in expected_core:
         assert exp in codes, f"Missing ministry: {exp}"
 
@@ -148,3 +201,11 @@ def test_deterministic_seed_coverage():
     vp_names = {vp.full_name for vp in vice_premiers}
     assert "Władysław Kosiniak-Kamysz" in vp_names
     assert "Krzysztof Gawkowski" in vp_names
+
+    former_ministers = {o.full_name: o for o in officials if o.full_name in {"Adam Szłapka", "Katarzyna Kotula", "Adriana Porowska", "Marzena Okła-Drewnowicz"}}
+    assert set(former_ministers) == {"Adam Szłapka", "Katarzyna Kotula", "Adriana Porowska", "Marzena Okła-Drewnowicz"}
+    assert all(o.role_category == RoleCategory.MINISTER for o in former_ministers.values())
+
+    former_mfipr = {o.full_name: o for o in officials if o.full_name in {"Jan Szyszko", "Katarzyna Pełczyńska-Nałęcz"}}
+    assert set(former_mfipr) == {"Jan Szyszko", "Katarzyna Pełczyńska-Nałęcz"}
+    assert all(not official.is_active for official in former_mfipr.values())

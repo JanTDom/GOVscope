@@ -6,7 +6,8 @@ export type RoleCategory =
   | 'MINISTER'
   | 'WICEMINISTER'
   | 'PELNOMOCNIK'
-  | 'RZECZNIK';
+  | 'RZECZNIK'
+  | 'DYREKTOR_GENERALNY';
 
 export type ConflictType =
   | 'KAKOFONIA_RESORTOWA'
@@ -31,6 +32,7 @@ export type TargetAudience =
 export interface MinisterLeadership {
   name: string;
   role: string;
+  roleCategory: RoleCategory;
   party: CoalitionParty;
   xHandle?: string;
   responsibilities: string[];
@@ -42,10 +44,31 @@ export interface MinistryItem {
   namePl: string;
   shortName: string;
   coalitionParty: CoalitionParty;
-  cohesionScore: number; // 0 - 100%
+  cohesionScore: number | null; // 0 - 100%, null when no verified basis exists
   activeAlertsCount: number;
   lastStatementDate: string;
   leadership: MinisterLeadership[];
+}
+
+export type GovernmentActivityKind =
+  | 'OFFICIAL_STATEMENT'
+  | 'PRESS_CONFERENCE'
+  | 'PLANNED_ACTIVITY'
+  | 'MEDIA_COVERAGE';
+
+export interface GovernmentActivity {
+  id: string;
+  kind: GovernmentActivityKind;
+  title: string;
+  summary: string;
+  publishedAt: string;
+  sourceUrl: string;
+  sourceName: string;
+  ministryCode?: string;
+  ministryName?: string;
+  officialName?: string;
+  status?: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+  location?: string;
 }
 
 export interface StatementComparison {
@@ -75,10 +98,11 @@ export interface NarrativeConflictItem {
     brusselsContext: string;
   };
   recommendedAction: string;
+  ministriesInvolved?: string[];
 }
 
 export interface SystemMetricSummary {
-  overallCohesionIndex: number;
+  overallCohesionIndex: number | null;
   activeP1Alerts: number;
   activeP2Alerts: number;
   totalMonitoredStatementsToday: number;

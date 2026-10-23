@@ -25,6 +25,7 @@ class RoleCategory(str, Enum):
     WICEMINISTER = "WICEMINISTER"
     PELNOMOCNIK = "PELNOMOCNIK"
     RZECZNIK = "RZECZNIK"
+    DYREKTOR_GENERALNY = "DYREKTOR_GENERALNY"
 
 
 class SourceType(str, Enum):

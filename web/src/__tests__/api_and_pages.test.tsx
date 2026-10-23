@@ -43,10 +43,8 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
 
   it('renders MeldunekPage for Prime Minister Donald Tusk', () => {
     render(<MeldunekPage />);
-    expect(screen.getAllByText(/Meldunek Dobowy dla Premiera/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Donald Tusk/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Kancelaria Prezesa Rady Ministrów/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Drukuj \/ Zapisz PDF/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Meldunek dobowy/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Brak danych do sporządzenia meldunku/).length).toBeGreaterThan(0);
   });
 
   it('renders AudytorPage with Gemini 2.5 Flash controls', () => {
@@ -59,34 +57,33 @@ describe('GOVscope Alert Center and EU Dimensions', () => {
   it('renders PremierPulpitPage with briefing and journalist ripostes', () => {
     render(<PremierPulpitPage />);
     expect(screen.getAllByText(/Pulpit Prezesa Rady Ministrów/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Donald Tusk/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/3 pytania, które na 100% padną dzisiaj od dziennikarzy/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Brak zweryfikowanego meldunku dla premiera/).length).toBeGreaterThan(0);
   });
 
   it('renders SzefKprmPage with SKRM legislative gate', () => {
     render(<SzefKprmPage />);
     expect(screen.getAllByText(/Pulpit Szefa KPRM i Przewodniczącego SKRM/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Jan Grabiec/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Maciej Berek/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Brak aktualnego zweryfikowanego wskazania/).length).toBeGreaterThan(0);
   });
 
   it('renders RzecznikPage with CIR media directives', () => {
     render(<RzecznikPage />);
-    expect(screen.getAllByText(/Pulpit Rzecznika Prasowego Rządu i CIR/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Rzecznik i komunikacja rządu/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Centrum Informacyjne Rządu/).length).toBeGreaterThan(0);
   });
 
   it('renders KoalicjaPage with Sejm majority bar and friction matrix', () => {
     render(<KoalicjaPage />);
-    expect(screen.getAllByText(/Pulpit Komitetu Politycznego Koalicji/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/460 posłów/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Komitet koalicji/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Brak zweryfikowanych danych koalicyjnych/).length).toBeGreaterThan(0);
   });
 
   it('renders WykresyPage with telemetry charts suite and KPI indicators', () => {
     render(<WykresyPage />);
-    expect(screen.getAllByText(/Matryca Wskaźników i Wykresów Rządowych/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Centrum Analityki i Metryk KPRM/).length).toBeGreaterThan(0);
-    expect(screen.getByText('Wszystkie wykresy (32)')).toBeDefined();
+    expect(screen.getAllByText(/Wykresy i metryki/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Centrum analityki i metryk KPRM/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Brak zweryfikowanej serii danych/)).toBeDefined();
   });
 
   it('authenticates with password PDT2026 and rejects unauthorized passwords', async () => {

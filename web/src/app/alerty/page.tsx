@@ -34,7 +34,8 @@ export default function AlertyPage() {
     async function fetchAlerts() {
       if (typeof window === 'undefined') return;
       try {
-        const res = await fetch('/api/alerty');
+        const ministry = new URLSearchParams(window.location.search).get('ministry');
+        const res = await fetch(ministry ? `/api/alerty?ministry=${encodeURIComponent(ministry)}` : '/api/alerty', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.alerts && Array.isArray(data.alerts)) {

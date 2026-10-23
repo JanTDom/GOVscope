@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { OFFICIAL_MINISTRIES } from '@/lib/constants';
+import type { MinistryItem } from '@/types';
 
 interface LegislativeDraftCheck {
   id: string;
@@ -15,53 +15,20 @@ interface LegislativeDraftCheck {
   notes: string;
 }
 
-const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [
-  {
-    id: 'leg-01',
-    rclNumber: 'UD-142',
-    title: 'Projekt ustawy o zmianie ustawy o świadczeniach opieki zdrowotnej finansowanych ze środków publicznych (Składka zdrowotna)',
-    applicantMinistry: 'MRiT / PSL',
-    applicantMinister: 'Krzysztof Paszyk',
-    skrmApprovalStatus: 'BALON_PROBNY',
-    fiscalImpactAssessment: 'BRAK_ZGODNY_MF',
-    notes: 'Projekt ogłoszony medialnie przed przekazaniem do uzgodnień międzyresortowych. Sprzeczność z limitami deficytu MF.',
-  },
-  {
-    id: 'leg-02',
-    rclNumber: 'UD-189',
-    title: 'Projekt ustawy o wsparciu kredytobiorców na rynku mieszkaniowym (Program Kredyt na start)',
-    applicantMinistry: 'MRiT',
-    applicantMinister: 'Krzysztof Paszyk',
-    skrmApprovalStatus: 'BLOKADA_SKRM',
-    fiscalImpactAssessment: 'WYMAGA_KONSULTACJI',
-    notes: 'Weto koalicyjne ze strony MFiPR (Polska 2050) i Lewicy. Skierowano do zespołu roboczego SKRM.',
-  },
-  {
-    id: 'leg-03',
-    rclNumber: 'UD-98',
-    title: 'Projekt ustawy o zmianie ustawy o Krajowej Radzie Sądownictwa (Praworządność)',
-    applicantMinistry: 'MS',
-    applicantMinister: 'Adam Bodnar',
-    skrmApprovalStatus: 'UZGODNIONE',
-    fiscalImpactAssessment: 'POZYTYWNA_MF',
-    notes: 'Pełna zgodność z harmonogramem rządu i kamieniami milowymi KPO. Zgoda Komitetu do Spraw Europejskich.',
-  },
-  {
-    id: 'leg-04',
-    rclNumber: 'UD-215',
-    title: 'Projekt ustawy o finansowaniu strategicznych inwestycji obronnych (Tarcza Wschód)',
-    applicantMinistry: 'MON',
-    applicantMinister: 'Władysław Kosiniak-Kamysz',
-    skrmApprovalStatus: 'UZGODNIONE',
-    fiscalImpactAssessment: 'POZYTYWNA_MF',
-    notes: 'Priorytet rządowy KPRM. Kontrasygnata MF i MON, przyspieszony tryb legislacyjny.',
-  },
-];
+const LEGISLATIVE_DRAFTS_MONITORED: LegislativeDraftCheck[] = [];
 
 export default function SzefKprmPage() {
+  const [ministries, setMinistries] = useState<MinistryItem[]>([]);
   const [drafts, setDrafts] = useState<LegislativeDraftCheck[]>(LEGISLATIVE_DRAFTS_MONITORED);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/resorty', { cache: 'no-store' })
+      .then((response) => response.json() as Promise<{ ministries?: MinistryItem[] }>)
+      .then((payload) => setMinistries(Array.isArray(payload.ministries) ? payload.ministries : []))
+      .catch(() => setMinistries([]));
+  }, []);
 
   const handleAction = (id: string, actionType: string) => {
     setActionNotice(`Zastosowano dyspozycję SKRM: ${actionType} dla projektu ${id}. Zaktualizowano w systemie KPRM.`);
@@ -96,7 +63,7 @@ export default function SzefKprmPage() {
           </div>
           <div className="bg-slate-900 border border-slate-800 px-3.5 py-2 rounded-xl text-right">
             <span className="text-slate-400 block text-[10px]">Przewodniczący SKRM:</span>
-            <span className="text-amber-400 font-bold">Maciej Berek</span>
+            <span className="text-slate-400 font-bold">Brak aktualnego zweryfikowanego wskazania</span>
           </div>
         </div>
       </div>
@@ -111,26 +78,26 @@ export default function SzefKprmPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Projekty w wykazie prac</div>
-          <div className="text-3xl font-extrabold text-white font-mono">148</div>
+          <div className="text-3xl font-extrabold text-white font-mono">{drafts.length}</div>
           <div className="text-[11px] text-slate-400 font-mono">Zarejestrowane druki rządowe</div>
         </div>
 
         <div className="rounded-xl border border-rose-900/60 bg-rose-950/20 p-4 space-y-1">
           <div className="text-xs font-mono text-rose-300">Balony próbne bez zgody SKRM</div>
-          <div className="text-3xl font-extrabold text-rose-400 font-mono">2 projekty</div>
+          <div className="text-3xl font-extrabold text-rose-400 font-mono">{drafts.filter((draft) => draft.skrmApprovalStatus === 'BALON_PROBNY').length}</div>
           <div className="text-[11px] text-rose-300 font-mono">Wstrzymano bieg legislacyjny</div>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Pozytywna opinia MF</div>
-          <div className="text-3xl font-extrabold text-emerald-400 font-mono">82%</div>
-          <div className="text-[11px] text-slate-400 font-mono">Zgodność z dyscypliną budżetową</div>
+          <div className="text-3xl font-extrabold text-slate-300 font-mono">Brak danych</div>
+          <div className="text-[11px] text-slate-400 font-mono">Brak zweryfikowanego wykazu RCL</div>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-1">
           <div className="text-xs font-mono text-slate-400">Najbliższy Stały Komitet</div>
-          <div className="text-2xl font-bold text-amber-400 font-mono">Czwartek 10:00</div>
-          <div className="text-[11px] text-slate-400 font-mono">Porządek: 12 punktów</div>
+          <div className="text-2xl font-bold text-slate-300 font-mono">Brak danych</div>
+          <div className="text-[11px] text-slate-400 font-mono">Brak zweryfikowanego kalendarza SKRM</div>
         </div>
       </div>
 
@@ -193,6 +160,11 @@ export default function SzefKprmPage() {
 
         {/* Drafts Feed */}
         <div className="space-y-4">
+          {filteredDrafts.length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-sm text-slate-400">
+              Brak zweryfikowanych projektów legislacyjnych. Dane przykładowe są wyłączone.
+            </div>
+          )}
           {filteredDrafts.map((d) => (
             <div
               key={d.id}
@@ -280,7 +252,7 @@ export default function SzefKprmPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {OFFICIAL_MINISTRIES.slice(0, 9).map((m) => (
+          {ministries.slice(0, 9).map((m) => (
             <div
               key={m.id}
               className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-2 text-xs"
@@ -289,14 +261,14 @@ export default function SzefKprmPage() {
                 <span className="font-mono font-bold text-white text-sm">{m.code}</span>
                 <span
                   className={`font-mono font-bold ${
-                    m.cohesionScore >= 90
+                    m.cohesionScore !== null && m.cohesionScore >= 90
                       ? 'text-emerald-400'
-                      : m.cohesionScore >= 80
+                      : m.cohesionScore !== null && m.cohesionScore >= 80
                       ? 'text-amber-400'
                       : 'text-rose-400'
                   }`}
                 >
-                  {m.cohesionScore}% spójności
+                  {m.cohesionScore === null ? 'Brak danych o spójności' : `${m.cohesionScore}% spójności`}
                 </span>
               </div>
               <div className="text-slate-300 font-medium truncate">{m.namePl}</div>

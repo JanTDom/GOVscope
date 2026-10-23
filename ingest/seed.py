@@ -204,6 +204,26 @@ OFFICIAL_MINISTRIES_DATA: List[Dict[str, Any]] = [
         "bip_url": "https://msit-bip.gov.pl/",
     },
     {
+        "id": UUID(ADMIN_NAMESPACE + "000000000028"),
+        "code": "ME",
+        "name_pl": "Ministerstwo Energii",
+        "short_name": "ME",
+        "body_type": "MINISTRY",
+        "coalition_party": CoalitionParty.PSL,
+        "website_url": "https://www.gov.pl/web/energia",
+        "bip_url": "https://www.gov.pl/web/energia/kierownictwo",
+    },
+    {
+        "id": UUID(ADMIN_NAMESPACE + "000000000029"),
+        "code": "MFiPR",
+        "name_pl": "Ministerstwo Funduszy i Polityki Regionalnej",
+        "short_name": "MFiPR",
+        "body_type": "MINISTRY",
+        "coalition_party": CoalitionParty.POLSKA_2050,
+        "website_url": "https://www.gov.pl/web/fundusze-regiony",
+        "bip_url": "https://www.gov.pl/web/fundusze-regiony/kierownictwo-ministerstwa",
+    },
+    {
         "id": UUID(ADMIN_NAMESPACE + "000000000019"),
         "code": "MP",
         "name_pl": "Ministerstwo Przemysłu",
@@ -218,7 +238,7 @@ OFFICIAL_MINISTRIES_DATA: List[Dict[str, Any]] = [
         "code": "M_UE",
         "name_pl": "Minister do spraw Unii Europejskiej",
         "short_name": "MdsUE",
-        "body_type": "MINISTRY",
+        "body_type": "CENTRAL_OFFICE",
         "coalition_party": CoalitionParty.KO,
         "website_url": "https://www.gov.pl/web/premier/minister-do-spraw-unii-europejskiej",
         "bip_url": "https://bip.kprm.gov.pl/",
@@ -236,8 +256,8 @@ OFFICIAL_MINISTRIES_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(ADMIN_NAMESPACE + "000000000022"),
         "code": "M_SENIOR",
-        "name_pl": "Minister do spraw Polityki Senioralnej",
-        "short_name": "MdsPS",
+        "name_pl": "Pełnomocnik Rządu do spraw Polityki Senioralnej",
+        "short_name": "Seniorzy",
         "body_type": "CENTRAL_OFFICE",
         "coalition_party": CoalitionParty.KO,
         "website_url": "https://www.gov.pl/web/premier",
@@ -355,18 +375,18 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000006"),
         "ministry_code": "MSWiA",
-        "full_name": "Tomasz Siemoniak",
-        "role_title": "Minister Spraw Wewnętrznych i Administracji, Koordynator Służb Specjalnych",
+        "full_name": "Marcin Kierwiński",
+        "role_title": "Minister Spraw Wewnętrznych i Administracji",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.KO,
-        "x_handle": "@TomaszSiemoniak",
+        "x_handle": "@MKierwinski",
         "linkedin_url": "https://pl.linkedin.com/in/tomasz-siemoniak",
         "responsibilities": ["Bezpieczeństwo wewnętrzne", "Służby specjalne", "Administracja publiczna"],
     },
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000007"),
         "ministry_code": "MS",
-        "full_name": "Adam Bodnar",
+        "full_name": "Waldemar Żurek",
         "role_title": "Minister Sprawiedliwości, Prokurator Generalny",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.KO,
@@ -377,7 +397,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000008"),
         "ministry_code": "MAP",
-        "full_name": "Jakub Jaworowski",
+        "full_name": "Wojciech Balczun",
         "role_title": "Minister Aktywów Państwowych",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.KO,
@@ -443,7 +463,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000014"),
         "ministry_code": "MNiSW",
-        "full_name": "Dariusz Wieczorek",
+        "full_name": "Marcin Kulasek",
         "role_title": "Minister Nauki i Szkolnictwa Wyższego",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.NOWA_LEWICA,
@@ -465,7 +485,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000016"),
         "ministry_code": "MRiRW",
-        "full_name": "Czesław Siekierski",
+        "full_name": "Stefan Krajewski",
         "role_title": "Minister Rolnictwa i Rozwoju Wsi",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.PSL,
@@ -476,7 +496,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000017"),
         "ministry_code": "MKiDN",
-        "full_name": "Hanna Wróblewska",
+        "full_name": "Marta Cienkowska",
         "role_title": "Minister Kultury i Dziedzictwa Narodowego",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.KO,
@@ -487,7 +507,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000018"),
         "ministry_code": "MSiT",
-        "full_name": "Sławomir Nitras",
+        "full_name": "Jakub Rutnicki",
         "role_title": "Minister Sportu i Turystyki",
         "role_category": RoleCategory.MINISTER,
         "coalition_party": CoalitionParty.KO,
@@ -508,18 +528,18 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     },
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000020"),
-        "ministry_code": "M_UE",
-        "full_name": "Adam Szłapka",
-        "role_title": "Minister do spraw Unii Europejskiej",
-        "role_category": RoleCategory.MINISTER,
+        "ministry_code": "MSZ",
+        "full_name": "Radosław Sikorski",
+        "role_title": "Wiceprezes Rady Ministrów, Minister Spraw Zagranicznych",
+        "role_category": RoleCategory.WICEPREMIER,
         "coalition_party": CoalitionParty.KO,
-        "x_handle": "@szlapka",
+        "x_handle": "@radeksikorski",
         "linkedin_url": "https://pl.linkedin.com/in/adamszlapka",
         "responsibilities": ["Sprawy europejskie", "Rada UE", "Koordynacja polskiego stanowiska w Brukseli"],
     },
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000021"),
-        "ministry_code": "M_ROWNOSC",
+        "ministry_code": "KPRM",
         "full_name": "Katarzyna Kotula",
         "role_title": "Minister do spraw Równości",
         "role_category": RoleCategory.MINISTER,
@@ -530,7 +550,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     },
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000022"),
-        "ministry_code": "M_SENIOR",
+        "ministry_code": "KPRM",
         "full_name": "Marzena Okła-Drewnowicz",
         "role_title": "Minister do spraw Polityki Senioralnej",
         "role_category": RoleCategory.MINISTER,
@@ -541,7 +561,7 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
     },
     {
         "id": UUID(OFFICIAL_NAMESPACE + "000000000023"),
-        "ministry_code": "M_SPOLECZENSTWO",
+        "ministry_code": "KPRM",
         "full_name": "Adriana Porowska",
         "role_title": "Minister do spraw Społeczeństwa Obywatelskiego",
         "role_category": RoleCategory.MINISTER,
@@ -572,11 +592,131 @@ OFFICIALS_DATA: List[Dict[str, Any]] = [
         "linkedin_url": "https://pl.linkedin.com/in/jan-grabiec",
         "responsibilities": ["Kierowanie KPRM", "Komunikacja rządu", "Koordynacja gabinetu"],
     },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000026"),
+        "ministry_code": "KPRM",
+        "full_name": "Adam Szłapka",
+        "role_title": "Minister do spraw Unii Europejskiej",
+        "role_category": RoleCategory.MINISTER,
+        "coalition_party": CoalitionParty.KO,
+        "x_handle": "@AdamSzlapka",
+        "responsibilities": ["Komunikacja rządu", "Rzecznik rządu"],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000027"),
+        "ministry_code": "MC",
+        "full_name": "Dariusz Standerski",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.NOWA_LEWICA,
+        "responsibilities": ["Systemy i rejestry rządowe", "Sztuczna inteligencja"],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000030"),
+        "ministry_code": "MC",
+        "full_name": "Paweł Olszewski",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.KO,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000031"),
+        "ministry_code": "MC",
+        "full_name": "Michał Gramatyka",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.POLSKA_2050,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000032"),
+        "ministry_code": "MC",
+        "full_name": "Rafał Rosiński",
+        "role_title": "Podsekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.NON_PARTISAN,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000033"),
+        "ministry_code": "MFiPR",
+        "full_name": "Katarzyna Pełczyńska-Nałęcz",
+        "role_title": "Minister Funduszy i Polityki Regionalnej",
+        "role_category": RoleCategory.MINISTER,
+        "coalition_party": CoalitionParty.POLSKA_2050,
+        "responsibilities": ["Polityka regionalna", "Fundusze europejskie", "KPO"],
+        "is_active": False,
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000034"),
+        "ministry_code": "MFiPR",
+        "full_name": "Jacek Karnowski",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.KO,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000035"),
+        "ministry_code": "MFiPR",
+        "full_name": "Jan Szyszko",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.POLSKA_2050,
+        "responsibilities": [],
+        "is_active": False,
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000036"),
+        "ministry_code": "ME",
+        "full_name": "Miłosz Motyka",
+        "role_title": "Minister Energii",
+        "role_category": RoleCategory.MINISTER,
+        "coalition_party": CoalitionParty.PSL,
+        "responsibilities": ["Energia", "Bezpieczeństwo energetyczne"],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000037"),
+        "ministry_code": "ME",
+        "full_name": "Wojciech Wrochna",
+        "role_title": "Sekretarz Stanu, Pełnomocnik Rządu ds. Strategicznej Infrastruktury Energetycznej",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.NON_PARTISAN,
+        "responsibilities": ["Strategiczna infrastruktura energetyczna"],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000038"),
+        "ministry_code": "ME",
+        "full_name": "Piotr Paweł Masłowski",
+        "role_title": "Sekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.NON_PARTISAN,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000039"),
+        "ministry_code": "ME",
+        "full_name": "Konrad Wojnarowski",
+        "role_title": "Podsekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.PSL,
+        "responsibilities": [],
+    },
+    {
+        "id": UUID(OFFICIAL_NAMESPACE + "000000000040"),
+        "ministry_code": "ME",
+        "full_name": "Marian Zmarzły",
+        "role_title": "Podsekretarz Stanu",
+        "role_category": RoleCategory.WICEMINISTER,
+        "coalition_party": CoalitionParty.NON_PARTISAN,
+        "responsibilities": [],
+    },
 ]
 
 
 def get_reference_ministries() -> List[Ministry]:
-    """Returns validated Pydantic models for all 19 ministries, KPRM and RM committees."""
+    """Returns validated Pydantic models for ministries, KPRM and RM committees."""
     result: List[Ministry] = []
     for item in OFFICIAL_MINISTRIES_DATA:
         result.append(
@@ -595,7 +735,7 @@ def get_reference_ministries() -> List[Ministry]:
 
 
 def get_reference_officials() -> List[Official]:
-    """Returns validated Pydantic models for key constitutional ministers."""
+    """Returns validated ministers and current ministerial leadership."""
     ministry_by_code = {m["code"]: m["id"] for m in OFFICIAL_MINISTRIES_DATA}
     result: List[Official] = []
     for item in OFFICIAL_MINISTRIES_DATA:
@@ -613,6 +753,7 @@ def get_reference_officials() -> List[Official]:
                 x_handle=off.get("x_handle"),
                 linkedin_url=off.get("linkedin_url"),
                 responsibilities=off.get("responsibilities", []),
+                is_active=off.get("is_active", True),
             )
         )
     return result

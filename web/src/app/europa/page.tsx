@@ -1,76 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
-import { INITIAL_CONFLICTS } from '@/lib/store';
+import React, { useEffect, useState } from 'react';
+import type { NarrativeConflictItem } from '@/types';
+
+interface InfringementItem { id: string; title: string; directiveRef: string; stage: string; riskLevel: string; deadline: string; impact: string; responsibleMinistry: string; }
+interface KpoMilestone { id: string; code: string; title: string; status: string; quarter: string; ministry: string; }
+interface CouncilItem { date: string; name: string; city: string; leadOfficial: string; mainAgenda: string; }
 
 export default function EuropaPage() {
   const [activeTab, setActiveTab] = useState<'RADAR' | 'INFRINGEMENTS' | 'KPO' | 'COUNCILS'>('RADAR');
+  const [euConflicts, setEuConflicts] = useState<NarrativeConflictItem[]>([]);
+  const [infringements, setInfringements] = useState<InfringementItem[]>([]);
+  const [kpoMilestones, setKpoMilestones] = useState<KpoMilestone[]>([]);
+  const [upcomingCouncils, setUpcomingCouncils] = useState<CouncilItem[]>([]);
 
-  const euConflicts = INITIAL_CONFLICTS.filter(
-    (c) =>
-      c.conflictType === 'ROZDŹWIĘK_Z_BRUKSELĄ' ||
-      c.conflictType === 'RYZYKO_PROCEDURY_NARUSZENIOWEJ' ||
-      c.euImpact
-  );
-
-  const mockInfringements = [
-    {
-      id: 'inf-2026-01',
-      title: 'Transpozycja dyrektywy ETS2 (system handlu uprawnieniami do emisji dla transportu i budynków)',
-      directiveRef: 'Dyrektywa (UE) 2023/959',
-      stage: 'UZASADNIONA OPINIA (ART. 258)',
-      riskLevel: 'KRYTYCZNE (P1)',
-      deadline: '30 listopada 2026',
-      impact: 'Ryzyko wstrzymania wypłat z Funduszu Sprawiedliwej Transformacji i kar dziennych przed TSUE.',
-      responsibleMinistry: 'MKiŚ / MF',
-    },
-    {
-      id: 'inf-2026-02',
-      title: 'Standardy jakości powietrza i przekroczenia pyłów PM10 w aglomeracjach przemysłowych',
-      directiveRef: 'Dyrektywa 2008/50/WE',
-      stage: 'WEZWANIE DO USUNIĘCIA UCHYBIENIA',
-      riskLevel: 'WYSOKIE (P2)',
-      deadline: '15 grudnia 2026',
-      impact: 'Konieczność aktualizacji wojewódzkich programów ochrony powietrza.',
-      responsibleMinistry: 'MKiŚ',
-    },
-  ];
-
-  const mockKpoMilestones = [
-    {
-      id: 'kpo-b1',
-      code: 'B1G',
-      title: 'Wejście w życie reformy planowania przestrzennego i strategii rozwoju gmin',
-      status: 'REALIZACJA ZGODNA Z PLANEM',
-      quarter: 'IV kwartał 2026',
-      ministry: 'MRiT',
-    },
-    {
-      id: 'kpo-a4',
-      code: 'A4G',
-      title: 'Wdrożenie ram prawnych dla certyfikacji cyberbezpieczeństwa sektora publicznego',
-      status: 'ZAGROŻENIE OPÓŹNIENIEM',
-      quarter: 'I kwartał 2027',
-      ministry: 'MC',
-    },
-  ];
-
-  const mockCouncils = [
-    {
-      date: '17 listopada 2026',
-      name: 'Rada do Spraw Ogólnych (GAC)',
-      city: 'Bruksela',
-      leadOfficial: 'Adam Szłapka (Minister ds. UE)',
-      mainAgenda: 'Przygotowanie do posiedzenia Rady Europejskiej, przegląd praworządności, stan negocjacji wieloletnich ram finansowych.',
-    },
-    {
-      date: '24 listopada 2026',
-      name: 'Rada do Spraw Środowiska (ENVI)',
-      city: 'Bruksela',
-      leadOfficial: 'Urszula Zielińska (Sekretarz Stanu, MKiŚ)',
-      mainAgenda: 'Wdrożenie pakietu Fit for 55, mechanizmy osłonowe ETS2 dla gospodarstw domowych.',
-    },
-  ];
+  useEffect(() => {
+    fetch('/api/europa', { cache: 'no-store' })
+      .then((response) => response.json() as Promise<{ conflicts?: NarrativeConflictItem[]; euSignals?: { infringements?: InfringementItem[]; kpoMilestones?: KpoMilestone[]; upcomingCouncils?: CouncilItem[] } }>)
+      .then((payload) => {
+        setEuConflicts(Array.isArray(payload.conflicts) ? payload.conflicts : []);
+        setInfringements(Array.isArray(payload.euSignals?.infringements) ? payload.euSignals.infringements : []);
+        setKpoMilestones(Array.isArray(payload.euSignals?.kpoMilestones) ? payload.euSignals.kpoMilestones : []);
+        setUpcomingCouncils(Array.isArray(payload.euSignals?.upcomingCouncils) ? payload.euSignals.upcomingCouncils : []);
+      })
+      .catch(() => {
+        setEuConflicts([]); setInfringements([]); setKpoMilestones([]); setUpcomingCouncils([]);
+      });
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -94,18 +50,18 @@ export default function EuropaPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
           <div className="text-xs font-mono uppercase text-slate-400">Aktywne procedury naruszeniowe (Art. 258)</div>
-          <div className="mt-2 text-2xl font-bold text-white font-mono">24 sprawy</div>
-          <div className="mt-1 text-xs text-emerald-400 font-mono">Brak nowych wezwań w tym miesiącu</div>
+          <div className="mt-2 text-2xl font-bold text-white font-mono">{infringements.length}</div>
+          <div className="mt-1 text-xs text-slate-400 font-mono">Wyłącznie zweryfikowane dane źródłowe</div>
         </div>
         <div className="rounded-lg border border-red-900/60 bg-red-950/20 p-4">
           <div className="text-xs font-mono uppercase text-red-400">Wykryte rozbieżności z linią negocjacyjną</div>
-          <div className="mt-2 text-2xl font-bold text-red-400 font-mono">1 alert krytyczny P1</div>
-          <div className="mt-1 text-xs text-slate-300 font-mono">Dyrektywa ETS2 (resort klimatu)</div>
+          <div className="mt-2 text-2xl font-bold text-red-400 font-mono">{euConflicts.filter((conflict) => conflict.severity === 'P1_CRITICAL').length}</div>
+          <div className="mt-1 text-xs text-slate-300 font-mono">Zweryfikowane rozbieżności</div>
         </div>
         <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
           <div className="text-xs font-mono uppercase text-slate-400">Stan kamieni milowych KPO</div>
-          <div className="mt-2 text-2xl font-bold text-white font-mono">92% wskaźnika</div>
-          <div className="mt-1 text-xs text-slate-400 font-mono">Przygotowanie do kolejnego wniosku o płatność</div>
+          <div className="mt-2 text-2xl font-bold text-white font-mono">{kpoMilestones.length}</div>
+          <div className="mt-1 text-xs text-slate-400 font-mono">Zweryfikowane kamienie milowe</div>
         </div>
       </div>
 
@@ -129,7 +85,7 @@ export default function EuropaPage() {
               : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
           }`}
         >
-          Procedury naruszeniowe ({mockInfringements.length})
+          Procedury naruszeniowe ({infringements.length})
         </button>
         <button
           onClick={() => setActiveTab('KPO')}
@@ -139,7 +95,7 @@ export default function EuropaPage() {
               : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
           }`}
         >
-          Kamienie milowe KPO ({mockKpoMilestones.length})
+          Kamienie milowe KPO ({kpoMilestones.length})
         </button>
         <button
           onClick={() => setActiveTab('COUNCILS')}
@@ -149,7 +105,7 @@ export default function EuropaPage() {
               : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
           }`}
         >
-          Kalendarz posiedzeń Rady UE ({mockCouncils.length})
+          Kalendarz posiedzeń Rady UE ({upcomingCouncils.length})
         </button>
       </div>
 
@@ -226,7 +182,7 @@ export default function EuropaPage() {
             Kluczowe procedury naruszeniowe Komisji Europejskiej wobec Polski
           </h2>
           <div className="grid grid-cols-1 gap-3">
-            {mockInfringements.map((inf) => (
+            {infringements.map((inf) => (
               <div key={inf.id} className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-red-400">{inf.riskLevel}</span>
@@ -248,7 +204,7 @@ export default function EuropaPage() {
             Status kluczowych kamieni milowych KPO
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {mockKpoMilestones.map((kpo) => (
+            {kpoMilestones.map((kpo) => (
               <div key={kpo.id} className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-amber-400">{kpo.code}</span>
@@ -271,7 +227,7 @@ export default function EuropaPage() {
             Nadchodzące posiedzenia Rady Unii Europejskiej
           </h2>
           <div className="grid grid-cols-1 gap-3">
-            {mockCouncils.map((c, idx) => (
+            {upcomingCouncils.map((c, idx) => (
               <div key={idx} className="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-blue-400">{c.date} ({c.city})</span>

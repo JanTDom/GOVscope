@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { INITIAL_CONFLICTS } from '@/lib/store';
+import { getLiveConflicts } from '@/lib/live-data';
 
 interface AlertItem {
   id: string;
@@ -12,30 +12,49 @@ interface AlertItem {
   createdAt: string;
 }
 
-// In-memory alert registry
-let ALERTS_STORE: AlertItem[] = INITIAL_CONFLICTS.map((c, idx) => ({
-  id: `alt-2026-00${idx + 1}`,
-  conflictId: c.id,
-  priority: c.severity === 'P1_CRITICAL' ? 'P1' : 'P2',
-  topic: c.topic,
-  title: c.title,
-  targetAudience: c.severity === 'P1_CRITICAL' ? 'KPRM_PREMIER' : 'KPRM_KOMUNIKACJA',
-  status: 'DELIVERED',
-  createdAt: c.detectedAt,
-}));
-
 export async function GET(request: NextRequest) {
+  const conflicts = await getLiveConflicts();
   const { searchParams } = new URL(request.url);
+  const ministry = searchParams.get('ministry')?.trim().toUpperCase();
+  let ministryId = '';
+  if (ministry) {
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (baseUrl && anonKey) {
+      const response = await fetch(`${baseUrl}/rest/v1/ministries_and_bodies?select=id&code=eq.${encodeURIComponent(ministry)}&limit=1`, {
+        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const rows = await response.json() as Array<{ id?: string }>;
+        ministryId = String(rows[0]?.id ?? '');
+      }
+    }
+  }
+  const alerts: AlertItem[] = conflicts.map((c) => ({
+    id: `alert-${c.id}`,
+    conflictId: c.id,
+    priority: c.severity === 'P1_CRITICAL' ? 'P1' : c.severity === 'P2_HIGH' ? 'P2' : 'P3',
+    topic: c.topic,
+    title: c.title,
+    targetAudience: c.severity === 'P1_CRITICAL' ? 'KPRM_PREMIER' : 'KPRM_KOMUNIKACJA',
+    status: c.resolutionStatus === 'RESOLVED' ? 'RESOLVED' : 'DELIVERED',
+    createdAt: c.detectedAt,
+  }));
   const priority = searchParams.get('priority');
 
-  const filtered = priority
-    ? ALERTS_STORE.filter((a) => a.priority === priority)
-    : ALERTS_STORE;
+  const filtered = alerts.filter((alert) => {
+    const conflict = conflicts.find((item) => item.id === alert.conflictId);
+    const matchesPriority = !priority || alert.priority === priority;
+    const matchesMinistry = !ministry || Boolean(ministryId && conflict?.ministriesInvolved?.includes(ministryId));
+    return matchesPriority && matchesMinistry;
+  });
 
   return NextResponse.json({
     total: filtered.length,
-    p1Count: ALERTS_STORE.filter((a) => a.priority === 'P1').length,
+    p1Count: alerts.filter((a) => a.priority === 'P1').length,
     alerts: filtered,
+    dataStatus: 'VERIFIED_SOURCE_DATA',
   });
 }
 
@@ -44,20 +63,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { id, status } = body;
 
-    const alertIndex = ALERTS_STORE.findIndex((a) => a.id === id);
-    if (alertIndex === -1) {
-      return NextResponse.json({ error: 'Nie znaleziono alertu' }, { status: 404 });
-    }
-
-    ALERTS_STORE[alertIndex] = {
-      ...ALERTS_STORE[alertIndex],
-      status: status || ALERTS_STORE[alertIndex].status,
-    };
-
-    return NextResponse.json({
-      success: true,
-      alert: ALERTS_STORE[alertIndex],
-    });
+    return NextResponse.json({ error: 'Zmiana statusu wymaga zapisu przez worker serwerowy' }, { status: 403 });
   } catch {
     return NextResponse.json({ error: 'Nieprawidłowe żądanie' }, { status: 400 });
   }

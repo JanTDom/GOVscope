@@ -7,5 +7,6 @@ export async function POST() {
   });
 
   response.cookies.delete('govscope_session');
+  response.headers.set('Cache-Control', 'no-store');
   return response;
 }

@@ -78,6 +78,11 @@ export default function RozdziekiPage() {
 
       {/* Clash cards with chronological timeline */}
       <div className="space-y-6">
+        {clashConflicts.length === 0 && (
+          <div className="rounded-lg border border-dashed border-slate-700 bg-slate-900/50 p-8 text-sm text-slate-400">
+            Brak zweryfikowanych zderzeń wypowiedzi. Widok nie używa danych przykładowych; pojawią się tu wyłącznie konflikty wykryte na podstawie zapisanych źródeł.
+          </div>
+        )}
         {clashConflicts.map((c) => {
           const [stmtA, stmtB] = c.statements;
           const dateA = new Date(stmtA.publishedAt);
