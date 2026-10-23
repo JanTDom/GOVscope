@@ -205,6 +205,60 @@ def test_prime_minister_line_does_not_use_stale_statement():
     assert engine.evaluate_against_prime_minister_line(statement, official, [old_pm_statement]) is None
 
 
+def test_external_attack_is_pressure_signal_not_fact():
+    engine = CohesionEngine()
+    conflict = engine.evaluate_government_attack(
+        article_title="Opozycja mówi o skandalu i żąda dymisji ministra",
+        article_content="Materiał zarzuca rządowi kłamstwo i ukrywanie danych dotyczących budżetu.",
+        source_name="PAP",
+        source_url="https://example.test/article",
+    )
+
+    assert conflict is not None
+    assert conflict.conflict_type == ConflictType.ATAK_NA_RZAD
+    assert conflict.gemini_analysis["allegation_is_not_established_fact"] is True
+    assert conflict.gemini_analysis["requires_official_fact_check"] is True
+
+
+def test_risky_statement_requires_evidence_before_factual_label():
+    engine = CohesionEngine()
+    official = Official(
+        full_name="Minister Testowy",
+        role_title="Minister",
+        role_category=RoleCategory.MINISTER,
+        coalition_party=CoalitionParty.KO,
+    )
+    statement = OfficialStatement(
+        official_id=official.id,
+        ministry_id=uuid4(),
+        source_type=SourceType.PRESS_CONFERENCE,
+        title="Konferencja",
+        content="Gwarantuję, że wszyscy dostaną świadczenie bez żadnych kosztów.",
+        published_at=datetime.now(timezone.utc),
+    )
+
+    risk = engine.evaluate_statement_integrity(statement, official)
+    assert risk is not None
+    assert risk.conflict_type == ConflictType.RYZYKO_FAKTUALNE
+    assert risk.severity == Severity.P2_HIGH
+    assert risk.gemini_analysis["claim_status"] == "REQUIRES_VERIFICATION"
+
+    contradiction = engine.evaluate_statement_integrity(
+        statement,
+        official,
+        factual_evidence=[
+            {
+                "source_name": "Dane publiczne",
+                "source_url": "https://example.test/data",
+                "supports_claim": "false",
+            }
+        ],
+    )
+    assert contradiction is not None
+    assert contradiction.severity == Severity.P1_CRITICAL
+    assert contradiction.gemini_analysis["claim_status"] == "CONTRADICTED_WITH_EVIDENCE"
+
+
 def test_eu_alignment_and_infringement_risk():
     engine = CohesionEngine()
     official = Official(

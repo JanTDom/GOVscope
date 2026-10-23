@@ -501,6 +501,112 @@ class CohesionEngine:
 
         return None
 
+    def evaluate_government_attack(
+        self,
+        article_title: str,
+        article_content: str,
+        source_name: str,
+        source_url: Optional[str] = None,
+        published_at: Optional[datetime] = None,
+    ) -> Optional[NarrativeConflict]:
+        """Flags an external attack on the government as a pressure signal.
+
+        This does not establish that an allegation is true. It identifies a
+        relevant, potentially escalating attack that requires official fact
+        verification and a communication response.
+        """
+        text = f"{article_title} {article_content}".lower()
+        government_markers = ("rząd", "premier", "minister", "ministerstwo", "kprm", "koalicj")
+        attack_markers = (
+            "afera", "kłamstwo", "kłamie", "skandal", "dymisj", "dane są fałszywe",
+            "prokuratura", "zarzuty", "ukrywa", "oszukał", "oszustwo", "atak opozycji",
+        )
+        matched_government = [marker for marker in government_markers if marker in text]
+        matched_attack = [marker for marker in attack_markers if marker in text]
+        if not matched_government or len(matched_attack) < 2:
+            return None
+
+        topic = self._matching_topics(text)
+        topic_label = topic[0] if topic else "działania rządu"
+        return NarrativeConflict(
+            conflict_type=ConflictType.ATAK_NA_RZAD,
+            severity=Severity.P1_CRITICAL if any(marker in text for marker in ("dymisj", "prokuratura", "kłamstwo")) else Severity.P2_HIGH,
+            title=f"Atak na rząd: {topic_label}",
+            summary=(
+                f"Materiał {source_name} zawiera skumulowane zarzuty wobec rządu lub jego przedstawicieli w sprawie {topic_label}. "
+                "To sygnał presji komunikacyjnej; prawdziwość zarzutów wymaga osobnej weryfikacji źródłowej."
+            ),
+            statements_involved=[
+                {
+                    "official": "Źródło medialne",
+                    "quote": article_content[:500],
+                    "source": source_name,
+                    "source_url": source_url,
+                    "published_at": (published_at or datetime.now(timezone.utc)).isoformat(),
+                }
+            ],
+            resolution_status=ResolutionStatus.DETECTED,
+            gemini_analysis={
+                "signal_type": "EXTERNAL_ATTACK",
+                "attack_markers": matched_attack,
+                "requires_official_fact_check": True,
+                "allegation_is_not_established_fact": True,
+            },
+        )
+
+    def evaluate_statement_integrity(
+        self,
+        statement: OfficialStatement,
+        official: Official,
+        factual_evidence: Optional[List[Dict[str, str]]] = None,
+    ) -> Optional[NarrativeConflict]:
+        """Flags risky claims and labels factual contradictions only with evidence."""
+        lowered = statement.content.lower()
+        risk_markers = (
+            "gwarantuję", "na pewno", "bez żadnych kosztów", "wszyscy dostaną",
+            "nie ma żadnego problemu", "dane są jednoznaczne", "potwierdzono",
+        )
+        matched_markers = [marker for marker in risk_markers if marker in lowered]
+        evidence = factual_evidence or []
+        evidence_contradicts = any(
+            item.get("supports_claim", "").lower() == "false" and item.get("source_url")
+            for item in evidence
+        )
+        if not matched_markers and not evidence_contradicts:
+            return None
+
+        severity = Severity.P1_CRITICAL if evidence_contradicts else Severity.P2_HIGH
+        basis = "zweryfikowane źródło przeczy twierdzeniu" if evidence_contradicts else "kategoryczne twierdzenie wymaga weryfikacji"
+        return NarrativeConflict(
+            conflict_type=ConflictType.RYZYKO_FAKTUALNE,
+            severity=severity,
+            title=f"Ryzyko faktualne: {official.full_name}",
+            summary=(
+                f"Wypowiedź {official.full_name} zawiera twierdzenie o podwyższonym ryzyku faktualnym: {basis}. "
+                "System nie oznacza wypowiedzi jako fałszywej bez wskazanego źródła weryfikacyjnego."
+            ),
+            statements_involved=[
+                {
+                    "statement_id": str(statement.id),
+                    "official": official.full_name,
+                    "quote": statement.content[:500],
+                    "source": statement.source_type.value,
+                },
+                *[
+                    {"source": item.get("source_name", "Źródło weryfikacyjne"), "source_url": item.get("source_url", ""), "supports_claim": item.get("supports_claim", "")}
+                    for item in evidence
+                ],
+            ],
+            ministries_involved=[statement.ministry_id],
+            officials_involved=[statement.official_id],
+            resolution_status=ResolutionStatus.DETECTED,
+            gemini_analysis={
+                "risk_markers": matched_markers,
+                "factual_evidence": evidence,
+                "claim_status": "CONTRADICTED_WITH_EVIDENCE" if evidence_contradicts else "REQUIRES_VERIFICATION",
+            },
+        )
+
     def generate_alert_for_conflict(self, conflict: NarrativeConflict) -> Alert:
         """Constructs an instant alert with audience routing based on conflict typology."""
         priority = (
@@ -517,6 +623,8 @@ class CohesionEngine:
         elif conflict.conflict_type in (
             ConflictType.NAPIECIE_KOALICYJNE,
             ConflictType.SPRZECZNOSC_Z_EXPOSE,
+            ConflictType.ATAK_NA_RZAD,
+            ConflictType.RYZYKO_FAKTUALNE,
         ):
             target = TargetAudience.KPRM_PREMIER
         else:
