@@ -128,6 +128,83 @@ def test_inter_ministerial_coalition_friction():
     assert alert.target_audience == TargetAudience.KPRM_PREMIER
 
 
+def test_current_prime_minister_line_is_primary_baseline():
+    engine = CohesionEngine()
+    now = datetime.now(timezone.utc)
+    pm_ministry = Ministry(code="KPRM", name_pl="Kancelaria Prezesa Rady Ministrów", short_name="KPRM")
+    pm = Official(
+        ministry_id=pm_ministry.id,
+        full_name="Donald Tusk",
+        role_title="Prezes Rady Ministrów",
+        role_category=RoleCategory.PREMIER,
+        coalition_party=CoalitionParty.KO,
+    )
+    minister = Official(
+        ministry_id=uuid4(),
+        full_name="Minister Testowy",
+        role_title="Minister",
+        role_category=RoleCategory.MINISTER,
+        coalition_party=CoalitionParty.PSL,
+    )
+    pm_statement = OfficialStatement(
+        official_id=pm.id,
+        ministry_id=pm_ministry.id,
+        source_type=SourceType.PRESS_CONFERENCE,
+        title="Konferencja premiera",
+        content="Rząd nie przyjmie relokacji migrantów w ramach paktu migracyjnego.",
+        published_at=now - timedelta(days=2),
+    )
+    minister_statement = OfficialStatement(
+        official_id=minister.id,
+        ministry_id=minister.ministry_id or uuid4(),
+        source_type=SourceType.MEDIA_INTERVIEW,
+        title="Wywiad ministra",
+        content="Rząd przyjmie relokację migrantów w ramach paktu migracyjnego.",
+        published_at=now,
+    )
+
+    conflict = engine.evaluate_against_prime_minister_line(
+        minister_statement,
+        minister,
+        prime_minister_statements=[pm_statement],
+    )
+
+    assert conflict is not None
+    assert conflict.conflict_type == ConflictType.SPRZECZNOSC_Z_EXPOSE
+    assert conflict.title == "Sprzeczność z linią premiera: pakt migracyjny"
+    assert conflict.severity == Severity.P1_CRITICAL
+    assert conflict.gemini_analysis["baseline"] == "CURRENT_PRIME_MINISTER_STATEMENTS"
+
+
+def test_prime_minister_line_does_not_use_stale_statement():
+    engine = CohesionEngine()
+    now = datetime.now(timezone.utc)
+    official = Official(
+        full_name="Minister Testowy",
+        role_title="Minister",
+        role_category=RoleCategory.MINISTER,
+        coalition_party=CoalitionParty.KO,
+    )
+    old_pm_statement = OfficialStatement(
+        official_id=uuid4(),
+        ministry_id=uuid4(),
+        source_type=SourceType.PRESS_CONFERENCE,
+        title="Dawna wypowiedź premiera",
+        content="Rząd nie wdroży ETS2.",
+        published_at=now - timedelta(days=120),
+    )
+    statement = OfficialStatement(
+        official_id=official.id,
+        ministry_id=uuid4(),
+        source_type=SourceType.PRESS_CONFERENCE,
+        title="Aktualna wypowiedź ministra",
+        content="Rząd wdroży ETS2 zgodnie z harmonogramem.",
+        published_at=now,
+    )
+
+    assert engine.evaluate_against_prime_minister_line(statement, official, [old_pm_statement]) is None
+
+
 def test_eu_alignment_and_infringement_risk():
     engine = CohesionEngine()
     official = Official(

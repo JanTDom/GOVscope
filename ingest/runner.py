@@ -83,6 +83,23 @@ class IngestionPipelineRunner:
             if not official:
                 continue
 
+            # The Prime Minister's complete recent public corpus is the primary
+            # baseline. The exposé remains only a fallback inside the engine.
+            pm_line = [
+                previous
+                for previous in self.stored_statements
+                if (pm_official := self.officials.get(previous.official_id))
+                and pm_official.role_category == RoleCategory.PREMIER
+            ]
+            pm_conflict = self.cohesion_engine.evaluate_against_prime_minister_line(
+                stmt,
+                official,
+                prime_minister_statements=pm_line,
+            )
+            if pm_conflict:
+                conflicts.append(pm_conflict)
+                self.active_alerts.append(self.cohesion_engine.generate_alert_for_conflict(pm_conflict))
+
             # 2. Check European Union alignment
             eu_conflict = self.cohesion_engine.evaluate_eu_alignment(stmt, official)
             if eu_conflict:

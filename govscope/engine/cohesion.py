@@ -63,11 +63,26 @@ POLICY_TOPICS = [
     "elektrownia jądrowa",
 ]
 
+POLICY_TOPIC_VARIANTS: Dict[str, Tuple[str, ...]] = {
+    "pakt migracyjny": ("pakt migrac", "paktu migrac", "pakcie migrac"),
+    "polityka migracyjna": ("polityk migrac",),
+    "składka zdrowotna": ("składk zdrowot",),
+    "wymiar sprawiedliwości": ("wymiar sprawied",),
+    "praworządność": ("praworząd",),
+}
+
 
 class CohesionEngine:
-    """Evaluates narrative coherence and alerts KPRM to emerging political and institutional fractures."""
+    """Evaluates narrative coherence against the current Prime Minister line and government policy."""
 
-    def __init__(self, expose_commitments: Optional[List[Dict[str, Any]]] = None) -> None:
+    def __init__(
+        self,
+        expose_commitments: Optional[List[Dict[str, Any]]] = None,
+        prime_minister_statements: Optional[List[OfficialStatement]] = None,
+    ) -> None:
+        # Exposé commitments remain a durable reference point, but are not the
+        # definition of the Prime Minister's current line. Current statements
+        # always take precedence when a matching, recent source exists.
         self.expose_commitments = expose_commitments or [
             {
                 "topic": "polityka migracyjna",
@@ -85,6 +100,124 @@ class CohesionEngine:
                 "keywords": ["praworządność", "krs", "sn", "kamienie milowe"],
             },
         ]
+        self.prime_minister_statements = prime_minister_statements or []
+
+    @staticmethod
+    def _matching_topics(text: str) -> List[str]:
+        lowered = text.lower()
+        return [
+            topic
+            for topic in POLICY_TOPICS
+            if topic in lowered or any(variant in lowered for variant in POLICY_TOPIC_VARIANTS.get(topic, ()))
+        ]
+
+    @staticmethod
+    def _contradiction_reason(first: str, second: str) -> Optional[str]:
+        markers = [
+            ("jest finansowanie", "nie ma środków"),
+            ("zostanie wprowadzone", "nie ma mowy"),
+            ("popieramy", "stanowczy sprzeciw"),
+            ("będzie kredyt 0%", "nie poprzemy kredytu 0%"),
+            ("obniżymy składkę", "nie ma zgody na obniżenie"),
+            ("zgoda rządu", "brak uzgodnienia"),
+            ("przyjmiemy", "nie przyjmiemy"),
+            ("przyjmie", "nie przyjmie"),
+            ("wdrożymy", "nie wdrożymy"),
+        ]
+        first_lower = first.lower()
+        second_lower = second.lower()
+        for positive, negative in markers:
+            if (positive in first_lower and negative in second_lower) or (
+                negative in first_lower and positive in second_lower
+            ):
+                return f"Zderzenie stanowisk: '{positive}' vs '{negative}'"
+        return None
+
+    def evaluate_against_prime_minister_line(
+        self,
+        statement: OfficialStatement,
+        official: Official,
+        prime_minister_statements: Optional[List[OfficialStatement]] = None,
+        reference_window_days: int = 90,
+    ) -> Optional[NarrativeConflict]:
+        """Compares a government statement with the PM's current public line.
+
+        The exposé is only a fallback when no recent PM statement addresses the
+        same topic. This prevents a stale programme document from overriding
+        the Prime Minister's later, source-backed public position.
+        """
+        if official.role_category == RoleCategory.PREMIER:
+            return None
+
+        candidates = prime_minister_statements if prime_minister_statements is not None else self.prime_minister_statements
+        topics = self._matching_topics(statement.content)
+        if not topics:
+            return None
+
+        recent_pm_statements = [
+            pm_statement
+            for pm_statement in candidates
+            if abs(statement.published_at - pm_statement.published_at) <= timedelta(days=reference_window_days)
+            and any(topic in self._matching_topics(pm_statement.content) for topic in topics)
+        ]
+
+        baseline_statement: Optional[OfficialStatement] = None
+        baseline_label = "CURRENT_PRIME_MINISTER_STATEMENTS"
+        reason: Optional[str] = None
+        if recent_pm_statements:
+            baseline_statement = max(recent_pm_statements, key=lambda item: item.published_at)
+            reason = self._contradiction_reason(statement.content, baseline_statement.content)
+        else:
+            # Preserve the historic programme baseline as a secondary source.
+            # It is explicitly labelled so downstream reports cannot confuse it
+            # with a current PM statement.
+            lowered = statement.content.lower()
+            for commitment in self.expose_commitments:
+                if any(keyword in lowered for keyword in commitment["keywords"]):
+                    baseline_label = "EXPOSE_FALLBACK"
+                    if any(
+                        positive in lowered and negative in commitment["core_line"].lower()
+                        for positive, negative in [("nie przyjmiemy", "przyjmie"), ("nie wdrożymy", "wdrożenie")]
+                    ):
+                        reason = f"Wypowiedź odbiega od zobowiązania programowego: {commitment['core_line']}"
+                    break
+
+        if reason is None:
+            return None
+
+        topic = topics[0]
+        return NarrativeConflict(
+            conflict_type=ConflictType.SPRZECZNOSC_Z_EXPOSE,
+            severity=Severity.P1_CRITICAL if baseline_label == "CURRENT_PRIME_MINISTER_STATEMENTS" else Severity.P2_HIGH,
+            title=f"Sprzeczność z linią premiera: {topic}",
+            summary=(
+                f"Wypowiedź {official.full_name} ({official.role_title}) odbiega od {('aktualnej wypowiedzi premiera' if baseline_label == 'CURRENT_PRIME_MINISTER_STATEMENTS' else 'zobowiązania programowego exposé')} w sprawie {topic}. {reason}."
+            ),
+            statements_involved=[
+                {
+                    "statement_id": str(statement.id),
+                    "official": official.full_name,
+                    "quote": statement.content[:500],
+                    "source": statement.source_type.value,
+                },
+                {
+                    "statement_id": str(baseline_statement.id) if baseline_statement else None,
+                    "official": "Prezes Rady Ministrów" if baseline_label == "CURRENT_PRIME_MINISTER_STATEMENTS" else "Exposé rządu",
+                    "quote": baseline_statement.content[:500] if baseline_statement else "",
+                    "source": baseline_statement.source_type.value if baseline_statement else "EXPOSE",
+                },
+            ],
+            ministries_involved=[statement.ministry_id],
+            officials_involved=[statement.official_id],
+            resolution_status=ResolutionStatus.DETECTED,
+            gemini_analysis={
+                "topic": topic,
+                "reason": reason,
+                "baseline": baseline_label,
+                "reference_window_days": reference_window_days,
+                "expose_is_fallback_only": True,
+            },
+        )
 
     # --- STAGE 1: Routine Message Filter ---
     def is_routine_announcement(self, text: str) -> Tuple[bool, Optional[str]]:
@@ -163,25 +296,8 @@ class CohesionEngine:
 
         topic = matched_topics[0]
 
-        # Check for direct contradictions (e.g. "będą środki" vs "brak środków", "tak" vs "nie", "nie poprzemy")
-        contradiction_markers = [
-            ("jest finansowanie", "nie ma środków"),
-            ("zostanie wprowadzone", "nie ma mowy"),
-            ("popieramy", "stanowczy sprzeciw"),
-            ("będzie kredyt 0%", "nie poprzemy kredytu 0%"),
-            ("obniżymy składkę", "nie ma zgody na obniżenie"),
-            ("zgoda rządu", "brak uzgodnienia"),
-        ]
-
-        has_direct_clash = False
-        reason = ""
-        for pos, neg in contradiction_markers:
-            if (pos in stmt_a.content.lower() and neg in stmt_b.content.lower()) or (
-                neg in stmt_a.content.lower() and pos in stmt_b.content.lower()
-            ):
-                has_direct_clash = True
-                reason = f"Zderzenie stanowisk: '{pos}' vs '{neg}'"
-                break
+        reason = self._contradiction_reason(stmt_a.content, stmt_b.content)
+        has_direct_clash = reason is not None
 
         # Check if coalition parties differ
         is_coalition_friction = official_a.coalition_party != official_b.coalition_party
