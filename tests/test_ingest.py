@@ -14,6 +14,7 @@ from govscope.models.entities import (
 from ingest.connectors.govpl import GovPlCollector
 from ingest.connectors.rcl import WykazPracCollector
 from ingest.engine import AsyncIngestEngine, RateLimiter
+from ingest.live import parse_rss
 from ingest.administration import parse_leadership_page, parse_roster
 from ingest.seed import (
     get_reference_ministries,
@@ -89,6 +90,25 @@ def test_govpl_rss_parsing():
     assert st1.ministry_id == ministry_id
     assert st1.official_id == official_id
     assert st1.source_url == "https://www.gov.pl/web/premier/posiedzenie-rm-budzet"
+
+
+def test_live_rss_parser_supports_atom_link_attributes():
+    atom = """<?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <title>Komunikat o zmianie w rządzie</title>
+        <link href="https://example.org/komunikat" />
+        <summary>Źródłowy materiał do monitoringu.</summary>
+        <updated>2026-10-23T12:00:00+02:00</updated>
+      </entry>
+    </feed>
+    """
+
+    records = parse_rss(atom, "test_atom", "Testowy feed")
+
+    assert len(records) == 1
+    assert records[0]["source_url"] == "https://example.org/komunikat"
+    assert records[0]["title"] == "Komunikat o zmianie w rządzie"
 
 
 def test_current_government_roster_parser_is_source_bound():

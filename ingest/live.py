@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from html import unescape
 from typing import Any, Iterable, Optional
 from urllib.parse import urljoin
+from uuid import UUID
 from xml.etree import ElementTree
 
 import asyncpg
@@ -74,9 +75,14 @@ def parse_rss(xml: str, source_key: str, source_name: str) -> list[dict[str, Any
     for item in items:
         def child(*names: str) -> str:
             for name in names:
-                node = item.find(name) or item.find(f".//{{*}}{name}")
-                if node is not None and node.text:
-                    return _text(node.text)
+                node = item.find(name)
+                if node is None:
+                    node = item.find(f".//{{*}}{name}")
+                if node is not None:
+                    href = node.attrib.get("href")
+                    value = href or node.text
+                    if value:
+                        return _text(value)
             return ""
 
         title = child("title") or "Komunikat urzędowy"
@@ -137,13 +143,16 @@ class LiveIngestionRunner:
         try:
             for source in self.sources:
                 started = datetime.now(timezone.utc)
+                run_id: Optional[UUID] = None
+                source_written = 0
                 try:
                     records = await self._fetch_source(source)
                     seen += len(records)
                     async with pool.acquire() as connection:
-                        await connection.execute(
-                            """INSERT INTO ingestion_runs (source_key, status, records_seen, records_written, finished_at)
-                               VALUES ($1, 'SUCCEEDED', $2, 0, NOW())""", source.key, len(records)
+                        run_id = await connection.fetchval(
+                            """INSERT INTO ingestion_runs (source_key, status, records_seen)
+                               VALUES ($1, 'RUNNING', $2)
+                               RETURNING id""", source.key, len(records)
                         )
                         for record in records:
                             if not record["source_url"]:
@@ -165,7 +174,7 @@ class LiveIngestionRunner:
                                     record["source_key"], record["content_hash"],
                                 )
                                 if result.endswith("1"):
-                                    written += 1
+                                    source_written += 1
                                 continue
                             result = await connection.execute(
                                 """INSERT INTO official_statements
@@ -179,14 +188,34 @@ class LiveIngestionRunner:
                                     "GOV_PL",
                             )
                             if result.endswith("1"):
-                                written += 1
+                                source_written += 1
+                        await connection.execute(
+                            """UPDATE ingestion_runs
+                               SET status = 'SUCCEEDED', records_seen = $2, records_written = $3, finished_at = NOW()
+                               WHERE id = $1""",
+                            run_id, len(records), source_written,
+                        )
                         await connection.execute(
                             "UPDATE ingestion_sources SET last_success_at = NOW(), last_error = NULL, records_ingested = records_ingested + $2, updated_at = NOW() WHERE source_key = $1",
                             source.key, len(records),
                         )
+                    written += source_written
                 except Exception as exc:
                     logger.exception("Source %s failed", source.key)
                     async with pool.acquire() as connection:
+                        if run_id is None:
+                            run_id = await connection.fetchval(
+                                """INSERT INTO ingestion_runs (source_key, status, records_seen, error)
+                                   VALUES ($1, 'FAILED', 0, $2)
+                                   RETURNING id""", source.key, str(exc)[:1000]
+                            )
+                        else:
+                            await connection.execute(
+                                """UPDATE ingestion_runs
+                                   SET status = 'FAILED', records_written = $2, finished_at = NOW(), error = $3
+                                   WHERE id = $1""",
+                                run_id, source_written, str(exc)[:1000],
+                            )
                         await connection.execute(
                             "UPDATE ingestion_sources SET last_error_at = NOW(), last_error = $2, updated_at = NOW() WHERE source_key = $1",
                             source.key, str(exc)[:1000],
