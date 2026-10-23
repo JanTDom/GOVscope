@@ -10,6 +10,16 @@ type RecordItem = {
   published_at: string;
   content_hash: string;
 };
+type ActivityItem = {
+  title: string;
+  summary: string;
+  starts_at: string;
+  location: string;
+  source_url: string;
+  source_key: string;
+  source_name: string;
+  content_hash: string;
+};
 
 const sources: Source[] = [
   { key: "govpl_premier", name: "Gov.pl KPRM", url: "https://www.gov.pl/web/premier", media: false, pagePrefix: "/web/premier/" },
@@ -49,6 +59,31 @@ function isGovernmentRelevant(item: RecordItem, source: Source): boolean {
   if (!source.media) return true;
   const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
   return governmentSignals.some((signal) => haystack.includes(signal));
+}
+
+function parseEvents(html: string, source: Source): Promise<ActivityItem[]> {
+  const blocks = [...html.matchAll(/<div class=["']event["'][\s\S]*?<\/li>/gi)].map((match) => match[0]);
+  return Promise.all(blocks.map(async (block) => {
+    const dateRaw = block.match(/<span class=["']date["'][^>]*>([\s\S]*?)<\/span>/i)?.[1] ?? "";
+    const date = text(dateRaw).match(/(\d{2})\.(\d{2})\.(\d{4})/);
+    const titleMatch = block.match(/<div class=["']title["'][\s\S]*?<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/i);
+    if (!date || !titleMatch) throw new Error(`Nieprawidłowy rekord wydarzenia z ${source.url}`);
+    const title = text(titleMatch[2]);
+    const location = text(block.match(/<span class=["']location["'][^>]*>([\s\S]*?)<\/span>/i)?.[1] ?? "");
+    const summary = text(block.match(/<div class=["']intro["'][^>]*>([\s\S]*?)<\/div>/i)?.[1] ?? title);
+    const sourceUrl = new URL(titleMatch[1], source.url).toString();
+    const startsAt = `${date[3]}-${date[2]}-${date[1]}T09:00:00Z`;
+    return {
+      title,
+      summary,
+      starts_at: startsAt,
+      location,
+      source_url: sourceUrl,
+      source_key: `${source.key}_events`,
+      source_name: `${source.name} — wydarzenia`,
+      content_hash: await hash(`${source.key}_events\u001f${sourceUrl}\u001f${startsAt}`),
+    };
+  }));
 }
 
 const text = (value: string) => value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
@@ -111,6 +146,22 @@ async function fetchItems(source: Source): Promise<RecordItem[]> {
   return records;
 }
 
+async function fetchEvents(source: Source): Promise<ActivityItem[]> {
+  const eventsUrl = `${source.url.replace(/\/$/, "")}/wydarzenia`;
+  const response = await fetch(eventsUrl, { headers: { "user-agent": "GOVscope/1.0 (+https://govscope.pl)" } });
+  if (!response.ok) throw new Error(`${eventsUrl}: HTTP ${response.status}`);
+  return parseEvents(await response.text(), source);
+}
+
+function activityStatus(startsAt: string): "PLANNED" | "ONGOING" | "COMPLETED" {
+  const start = new Date(startsAt).getTime();
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  if (start > now + day) return "PLANNED";
+  if (start > now - day) return "ONGOING";
+  return "COMPLETED";
+}
+
 Deno.serve(async (request) => {
   if (request.method !== "POST") return new Response(JSON.stringify({ error: "POST required" }), { status: 405 });
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -144,6 +195,48 @@ Deno.serve(async (request) => {
       result.records_written += count;
       await supabase.from("ingestion_runs").update({ status: "SUCCEEDED", records_written: count, finished_at: new Date().toISOString() }).eq("id", run.data.id);
       await supabase.from("ingestion_sources").update({ last_success_at: new Date().toISOString(), last_error: null, records_ingested: count, updated_at: new Date().toISOString() }).eq("source_key", source.key);
+      result.sources_succeeded += 1;
+
+      // Gov.pl redirects many ministry `/wydarzenia` pages to the shared KPRM
+      // calendar. Until a ministry exposes its own canonical event feed, only
+      // ingest the KPRM calendar to avoid attributing one event to the wrong
+      // resort.
+      if (source.media || source.key !== "govpl_premier") continue;
+      const events = await fetchEvents(source);
+      const eventSourceKey = `${source.key}_events`;
+      const eventSourceRegistration = await supabase.from("ingestion_sources").upsert({
+        source_key: eventSourceKey,
+        source_name: `${source.name} — wydarzenia`,
+        source_kind: "GOV_PL_EVENTS",
+        endpoint_url: `${source.url.replace(/\/$/, "")}/wydarzenia`,
+        enabled: true,
+        updated_at: started,
+      }, { onConflict: "source_key" });
+      if (eventSourceRegistration.error) throw eventSourceRegistration.error;
+      const eventRun = await supabase.from("ingestion_runs").insert({ source_key: eventSourceKey, status: "RUNNING", records_seen: events.length }).select("id").single();
+      if (eventRun.error) throw eventRun.error;
+      let eventsWritten = 0;
+      for (const event of events) {
+        const inserted = await supabase.from("government_activities").insert({
+          activity_type: /konferenc|spotkan|szczyt|forum/i.test(event.title) ? "CONFERENCE" : "OTHER",
+          status: activityStatus(event.starts_at),
+          title: event.title,
+          summary: event.summary,
+          starts_at: event.starts_at,
+          location: event.location || null,
+          source_name: event.source_name,
+          source_url: event.source_url,
+          source_key: event.source_key,
+          content_hash: event.content_hash,
+          verified: true,
+        });
+        if (inserted.error && inserted.error.code !== "23505") throw inserted.error;
+        if (!inserted.error) eventsWritten += 1;
+      }
+      await supabase.from("ingestion_runs").update({ status: "SUCCEEDED", records_written: eventsWritten, finished_at: new Date().toISOString() }).eq("id", eventRun.data.id);
+      await supabase.from("ingestion_sources").update({ last_success_at: new Date().toISOString(), last_error: null, records_ingested: eventsWritten, updated_at: new Date().toISOString() }).eq("source_key", eventSourceKey);
+      result.records_seen += events.length;
+      result.records_written += eventsWritten;
       result.sources_succeeded += 1;
     } catch (error) {
       result.sources_failed += 1;
