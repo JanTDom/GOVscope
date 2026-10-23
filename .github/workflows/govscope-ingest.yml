@@ -19,16 +19,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install ingestion dependencies
-        run: python -m pip install --disable-pip-version-check asyncpg httpx tenacity pydantic pydantic-settings
-      - name: Fetch verified public sources
-        env:
-          DATABASE_URL: ${{ secrets.GOVSCOPE_DATABASE_URL }}
-        run: python -m ingest.live
-      - name: Refresh active government roster
-        env:
-          DATABASE_URL: ${{ secrets.GOVSCOPE_DATABASE_URL }}
-        run: python -m ingest.administration
+      - name: Fetch and persist verified public sources
+        run: >-
+          curl --fail-with-body --retry 3 --retry-delay 5 --max-time 180
+          -X POST
+          -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10ZGV0c3p3aGJ0Zm9rd2JjaHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MTE0ODYsImV4cCI6MjEwODE4NzQ4Nn0.H0F617xLBqTxPaxdmhLrzd26Mp-R9EpwkgLkyPKVZeU'
+          -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10ZGV0c3p3aGJ0Zm9rd2JjaHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MTE0ODYsImV4cCI6MjEwODE4NzQ4Nn0.H0F617xLBqTxPaxdmhLrzd26Mp-R9EpwkgLkyPKVZeU'
+          https://mtdetszwhbtfokwbchtp.supabase.co/functions/v1/govscope-ingest
