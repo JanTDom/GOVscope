@@ -56,6 +56,21 @@ async function fetchItems(source: Source): Promise<RecordItem[]> {
   if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
   const body = await response.text();
   if (source.key !== "govpl_premier") return parseFeed(body, source);
+  const section = body.split(/id=["']Aktualnosci["']/i)[1]?.split(/<\/section>/i)[0] ?? "";
+  const officialLinks = [...section.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)]
+    .map((match) => ({ url: new URL(match[1], source.url).toString(), title: text(match[2]) }))
+    .filter((item) => item.url.includes("/web/premier/") && item.title && !item.url.endsWith("/wydarzenia"));
+  if (officialLinks.length) {
+    return Promise.all(officialLinks.slice(0, 20).map(async (item) => ({
+      source_key: source.key,
+      source_name: source.name,
+      title: item.title,
+      content: item.title,
+      source_url: item.url,
+      published_at: "",
+      content_hash: await hash(`${source.key}\u001f${item.url}\u001f${item.title}`),
+    })));
+  }
   const feedUrls = [...body.matchAll(/<link[^>]+(?:href|url)=["']([^"']*(?:rss|feed|atom|xml)[^"']*)["']/gi)].map((match) => new URL(match[1], source.url).toString());
   const records: RecordItem[] = [];
   for (const feedUrl of [...new Set(feedUrls)].slice(0, 6)) {
