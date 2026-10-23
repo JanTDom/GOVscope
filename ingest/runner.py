@@ -100,6 +100,11 @@ class IngestionPipelineRunner:
                 conflicts.append(pm_conflict)
                 self.active_alerts.append(self.cohesion_engine.generate_alert_for_conflict(pm_conflict))
 
+            integrity_conflict = self.cohesion_engine.evaluate_statement_integrity(stmt, official)
+            if integrity_conflict:
+                conflicts.append(integrity_conflict)
+                self.active_alerts.append(self.cohesion_engine.generate_alert_for_conflict(integrity_conflict))
+
             # 2. Check European Union alignment
             eu_conflict = self.cohesion_engine.evaluate_eu_alignment(stmt, official)
             if eu_conflict:

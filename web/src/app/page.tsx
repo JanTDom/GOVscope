@@ -35,6 +35,8 @@ export default function RadarKPRMPage() {
     'Balon próbny': conflicts.filter((c) => c.conflictType === 'BALON_PRÓBNY').length,
     'Kakofonia resortowa': conflicts.filter((c) => c.conflictType === 'KAKOFONIA_RESORTOWA').length,
     'Sprzeczność z linią premiera': conflicts.filter((c) => c.conflictType === 'SPRZECZNOŚĆ_Z_EXPOSE').length,
+    'Atak na rząd': conflicts.filter((c) => c.conflictType === 'ATAK_NA_RZĄD').length,
+    'Ryzyko faktualne': conflicts.filter((c) => c.conflictType === 'RYZYKO_FAKTUALNE').length,
   };
 
   const p1Conflicts = conflicts.filter((c) => c.severity === 'P1_CRITICAL');
