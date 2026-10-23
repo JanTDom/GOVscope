@@ -16,6 +16,10 @@ dependencies = [
     "asyncpg>=0.29.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["govscope*", "ingest*"]
+exclude = ["tests*", "web*", "supabase*"]
+
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
