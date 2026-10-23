@@ -55,6 +55,8 @@ const governmentSignals = [
   "domanski", "domański", "kosiniak", "hołownia", "kierwiński", "sikorski",
 ];
 const nonGovernmentTopics = ["trzęsienie ziemi", "morze tyrreńskie", "sycylia", "wstrząsy sejsmiczne"];
+const attackMarkers = ["afera", "kłamstwo", "kłamie", "skandal", "dymisj", "prokuratura", "zarzuty", "ukrywa", "oszustwo"];
+const riskMarkers = ["gwarantuję", "na pewno", "bez żadnych kosztów", "wszyscy dostaną", "nie ma żadnego problemu", "dane są jednoznaczne", "potwierdzono"];
 
 function isGovernmentRelevant(item: RecordItem, source: Source): boolean {
   if (!source.media) return true;
@@ -67,6 +69,50 @@ function isPrimeMinisterStatement(item: RecordItem, source: Source): boolean {
   if (source.key !== "govpl_premier") return false;
   const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
   return ["donald tusk", "premier", "prezes rady ministrów", "konferencja premiera"].some((signal) => haystack.includes(signal));
+}
+
+function detectExternalAttack(item: RecordItem): { title: string; summary: string; severity: "P1_CRITICAL" | "P2_HIGH"; markers: string[] } | null {
+  const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
+  const governmentMention = ["rząd", "premier", "minister", "ministerstwo", "kprm", "koalicj"].some((marker) => haystack.includes(marker));
+  const matched = attackMarkers.filter((marker) => haystack.includes(marker));
+  if (!governmentMention || matched.length < 2) return null;
+  return {
+    title: `Atak na rząd: ${item.title}`,
+    summary: `Materiał ${item.source_name} zawiera skumulowane zarzuty wobec rządu lub jego przedstawicieli. To sygnał presji komunikacyjnej; prawdziwość zarzutów wymaga osobnej weryfikacji źródłowej.`,
+    severity: matched.some((marker) => ["dymisj", "prokuratura", "kłamstwo"].includes(marker)) ? "P1_CRITICAL" : "P2_HIGH",
+    markers: matched,
+  };
+}
+
+function detectStatementRisk(item: RecordItem): { title: string; summary: string; markers: string[] } | null {
+  const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
+  const matched = riskMarkers.filter((marker) => haystack.includes(marker));
+  if (!matched.length) return null;
+  return {
+    title: `Ryzyko faktualne: ${item.title}`,
+    summary: "Wypowiedź zawiera kategoryczne twierdzenie wymagające weryfikacji. System nie oznacza jej jako fałszywej bez przypiętego źródła dowodowego.",
+    markers: matched,
+  };
+}
+
+async function persistDerivedConflict(
+  supabase: ReturnType<typeof createClient>,
+  conflict: { conflict_type: string; severity: string; title: string; summary: string; statements_involved: unknown[]; gemini_analysis: Record<string, unknown> },
+): Promise<void> {
+  const recent = await supabase.from("narrative_conflicts").select("id").eq("title", conflict.title).gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).limit(1);
+  if (recent.error) throw recent.error;
+  if (recent.data?.length) return;
+  const inserted = await supabase.from("narrative_conflicts").insert({ ...conflict, resolution_status: "DETECTED", verified: true }).select("id").single();
+  if (inserted.error) throw inserted.error;
+  await supabase.from("alerts").insert({
+    conflict_id: inserted.data.id,
+    priority: conflict.severity === "P1_CRITICAL" ? "P1" : "P2",
+    target_audience: "KPRM_KOMUNIKACJA",
+    channel: "INTERNAL_RADAR",
+    status: "QUEUED",
+    payload: { conflict_title: conflict.title, summary: conflict.summary },
+    verified: true,
+  });
 }
 
 function parseEvents(html: string, source: Source): Promise<ActivityItem[]> {
@@ -224,6 +270,29 @@ Deno.serve(async (request) => {
         const inserted = await supabase.from(table).insert(row);
         if (inserted.error && inserted.error.code !== "23505") throw inserted.error;
         if (!inserted.error) count += 1;
+      }
+      for (const item of records) {
+        if (source.media) {
+          const attack = detectExternalAttack(item);
+          if (attack) await persistDerivedConflict(supabase, {
+            conflict_type: "ATAK_NA_RZĄD",
+            severity: attack.severity,
+            title: attack.title,
+            summary: attack.summary,
+            statements_involved: [{ source: item.source_name, quote: item.content.slice(0, 500), source_url: item.source_url }],
+            gemini_analysis: { signal_type: "EXTERNAL_ATTACK", attack_markers: attack.markers, requires_official_fact_check: true, allegation_is_not_established_fact: true },
+          });
+        } else {
+          const risk = detectStatementRisk(item);
+          if (risk) await persistDerivedConflict(supabase, {
+            conflict_type: "RYZYKO_FAKTUALNE",
+            severity: "P2_HIGH",
+            title: risk.title,
+            summary: risk.summary,
+            statements_involved: [{ source: item.source_name, quote: item.content.slice(0, 500), source_url: item.source_url }],
+            gemini_analysis: { risk_markers: risk.markers, claim_status: "REQUIRES_VERIFICATION", factual_evidence: [] },
+          });
+        }
       }
       result.records_written += count;
       await supabase.from("ingestion_runs").update({ status: "SUCCEEDED", records_written: count, finished_at: new Date().toISOString() }).eq("id", run.data.id);
