@@ -34,7 +34,7 @@ export default function RadarKPRMPage() {
     'Rozdźwięk z Brukselą': conflicts.filter((c) => c.conflictType === 'ROZDŹWIĘK_Z_BRUKSELĄ').length,
     'Balon próbny': conflicts.filter((c) => c.conflictType === 'BALON_PRÓBNY').length,
     'Kakofonia resortowa': conflicts.filter((c) => c.conflictType === 'KAKOFONIA_RESORTOWA').length,
-    'Sprzeczność z exposé': conflicts.filter((c) => c.conflictType === 'SPRZECZNOŚĆ_Z_EXPOSE').length,
+    'Sprzeczność z linią premiera': conflicts.filter((c) => c.conflictType === 'SPRZECZNOŚĆ_Z_EXPOSE').length,
   };
 
   const p1Conflicts = conflicts.filter((c) => c.severity === 'P1_CRITICAL');

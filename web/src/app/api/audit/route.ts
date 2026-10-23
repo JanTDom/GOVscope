@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
 Twoje zadanie:
 Bezlitośnie i precyzyjnie audytujesz wypowiedzi członków rządu, zapowiedzi medialne oraz projekty ustaw pod kątem:
-1. Rozbieżności ze stanowiskiem premiera Donalda Tuska oraz expose rządu.
+1. Rozbieżności z aktualną, udokumentowaną linią komunikacyjną premiera Donalda Tuska, zbudowaną z jego konferencji, wywiadów, wystąpień, komunikatów KPRM i innych oficjalnych wypowiedzi. Exposé jest tylko jednym z dokumentów odniesienia i nie może zastępować późniejszych wypowiedzi premiera.
 2. Kakofonii resortowej i sporów w koalicji rządowej (KO, PSL, Polska 2050, Nowa Lewica).
 3. Przedwczesnych deklaracji bez uzgodnienia na Stałym Komitecie Rady Ministrów (SKRM) i z Ministrem Finansów (Andrzej Domański).
 4. Kolizji z polityką europejską (kamienie milowe KPO, procedura nadmiernego deficytu, unijne dyrektywy).
@@ -76,7 +76,7 @@ Zwróć poprawny JSON o następującej strukturze pól:
 {
   "overall_risk_score": <liczba od 0.0 do 10.0, np. 8.4>,
   "severity": <jeden z: "P1_CRITICAL" | "P2_HIGH" | "P3_MODERATE" | "LOW">,
-  "category": <jeden z: "KAKOFONIA_RESORTOWA" | "BALON_PRÓBNY" | "SPRZECZNOŚĆ_Z_EXPOSE" | "NAPIĘCIE_KOALICYJNE" | "ROZDŹWIĘK_Z_BRUKSELĄ" | "BŁĄD_W_WYWIADZIE">,
+  "category": <jeden z: "KAKOFONIA_RESORTOWA" | "BALON_PRÓBNY" | "SPRZECZNOŚĆ_Z_EXPOSE" (w systemie oznacza sprzeczność z aktualną linią premiera; exposé jest wyłącznie fallbackiem) | "NAPIĘCIE_KOALICYJNE" | "ROZDŹWIĘK_Z_BRUKSELĄ" | "BŁĄD_W_WYWIADZIE">,
   "coalition_friction": <true/false>,
   "friction_axis": "<np. KO vs PSL lub MF vs MRiT lub 'Brak - stanowisko jednolite'>",
   "affected_ministries": ["<np. MF>", "<np. MRiT>"],

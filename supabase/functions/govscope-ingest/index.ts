@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.1";
 
-type Source = { key: string; name: string; url: string; media: boolean; pagePrefix?: string };
+type Source = { key: string; name: string; url: string; media: boolean; pagePrefix?: string; ministryCode?: string };
 type RecordItem = {
   source_key: string;
   source_name: string;
@@ -22,25 +22,25 @@ type ActivityItem = {
 };
 
 const sources: Source[] = [
-  { key: "govpl_premier", name: "Gov.pl KPRM", url: "https://www.gov.pl/web/premier", media: false, pagePrefix: "/web/premier/" },
-  { key: "govpl_finanse", name: "Gov.pl Ministerstwo Finansów", url: "https://www.gov.pl/web/finanse", media: false, pagePrefix: "/web/finanse/" },
-  { key: "govpl_msz", name: "Gov.pl Ministerstwo Spraw Zagranicznych", url: "https://www.gov.pl/web/dyplomacja", media: false, pagePrefix: "/web/dyplomacja/" },
-  { key: "govpl_mon", name: "Gov.pl Ministerstwo Obrony Narodowej", url: "https://www.gov.pl/web/obrona-narodowa", media: false, pagePrefix: "/web/obrona-narodowa/" },
-  { key: "govpl_mswia", name: "Gov.pl Ministerstwo Spraw Wewnętrznych i Administracji", url: "https://www.gov.pl/web/mswia", media: false, pagePrefix: "/web/mswia/" },
-  { key: "govpl_ms", name: "Gov.pl Ministerstwo Sprawiedliwości", url: "https://www.gov.pl/web/sprawiedliwosc", media: false, pagePrefix: "/web/sprawiedliwosc/" },
-  { key: "govpl_map", name: "Gov.pl Ministerstwo Aktywów Państwowych", url: "https://www.gov.pl/web/aktywa-panstwowe", media: false, pagePrefix: "/web/aktywa-panstwowe/" },
-  { key: "govpl_mrit", name: "Gov.pl Ministerstwo Rozwoju i Technologii", url: "https://www.gov.pl/web/rozwoj-technologia", media: false, pagePrefix: "/web/rozwoj-technologia/" },
-  { key: "govpl_mkis", name: "Gov.pl Ministerstwo Klimatu i Środowiska", url: "https://www.gov.pl/web/klimat", media: false, pagePrefix: "/web/klimat/" },
-  { key: "govpl_mrpips", name: "Gov.pl Ministerstwo Rodziny, Pracy i Polityki Społecznej", url: "https://www.gov.pl/web/rodzina", media: false, pagePrefix: "/web/rodzina/" },
-  { key: "govpl_mz", name: "Gov.pl Ministerstwo Zdrowia", url: "https://www.gov.pl/web/zdrowie", media: false, pagePrefix: "/web/zdrowie/" },
-  { key: "govpl_men", name: "Gov.pl Ministerstwo Edukacji Narodowej", url: "https://www.gov.pl/web/edukacja", media: false, pagePrefix: "/web/edukacja/" },
-  { key: "govpl_mnisw", name: "Gov.pl Ministerstwo Nauki i Szkolnictwa Wyższego", url: "https://www.gov.pl/web/nauka", media: false, pagePrefix: "/web/nauka/" },
-  { key: "govpl_mi", name: "Gov.pl Ministerstwo Infrastruktury", url: "https://www.gov.pl/web/infrastruktura", media: false, pagePrefix: "/web/infrastruktura/" },
-  { key: "govpl_mrirw", name: "Gov.pl Ministerstwo Rolnictwa i Rozwoju Wsi", url: "https://www.gov.pl/web/rolnictwo", media: false, pagePrefix: "/web/rolnictwo/" },
-  { key: "govpl_mc", name: "Gov.pl Ministerstwo Cyfryzacji", url: "https://www.gov.pl/web/cyfryzacja", media: false, pagePrefix: "/web/cyfryzacja/" },
-  { key: "govpl_mkidn", name: "Gov.pl Ministerstwo Kultury i Dziedzictwa Narodowego", url: "https://www.gov.pl/web/kultura", media: false, pagePrefix: "/web/kultura/" },
-  { key: "govpl_msit", name: "Gov.pl Ministerstwo Sportu i Turystyki", url: "https://www.gov.pl/web/sport", media: false, pagePrefix: "/web/sport/" },
-  { key: "govpl_mp", name: "Gov.pl Ministerstwo Przemysłu", url: "https://www.gov.pl/web/przemysl", media: false, pagePrefix: "/web/przemysl/" },
+  { key: "govpl_premier", name: "Gov.pl KPRM", url: "https://www.gov.pl/web/premier", media: false, pagePrefix: "/web/premier/", ministryCode: "KPRM" },
+  { key: "govpl_finanse", name: "Gov.pl Ministerstwo Finansów", url: "https://www.gov.pl/web/finanse", media: false, pagePrefix: "/web/finanse/", ministryCode: "MF" },
+  { key: "govpl_msz", name: "Gov.pl Ministerstwo Spraw Zagranicznych", url: "https://www.gov.pl/web/dyplomacja", media: false, pagePrefix: "/web/dyplomacja/", ministryCode: "MSZ" },
+  { key: "govpl_mon", name: "Gov.pl Ministerstwo Obrony Narodowej", url: "https://www.gov.pl/web/obrona-narodowa", media: false, pagePrefix: "/web/obrona-narodowa/", ministryCode: "MON" },
+  { key: "govpl_mswia", name: "Gov.pl Ministerstwo Spraw Wewnętrznych i Administracji", url: "https://www.gov.pl/web/mswia", media: false, pagePrefix: "/web/mswia/", ministryCode: "MSWiA" },
+  { key: "govpl_ms", name: "Gov.pl Ministerstwo Sprawiedliwości", url: "https://www.gov.pl/web/sprawiedliwosc", media: false, pagePrefix: "/web/sprawiedliwosc/", ministryCode: "MS" },
+  { key: "govpl_map", name: "Gov.pl Ministerstwo Aktywów Państwowych", url: "https://www.gov.pl/web/aktywa-panstwowe", media: false, pagePrefix: "/web/aktywa-panstwowe/", ministryCode: "MAP" },
+  { key: "govpl_mrit", name: "Gov.pl Ministerstwo Rozwoju i Technologii", url: "https://www.gov.pl/web/rozwoj-technologia", media: false, pagePrefix: "/web/rozwoj-technologia/", ministryCode: "MRiT" },
+  { key: "govpl_mkis", name: "Gov.pl Ministerstwo Klimatu i Środowiska", url: "https://www.gov.pl/web/klimat", media: false, pagePrefix: "/web/klimat/", ministryCode: "MKiŚ" },
+  { key: "govpl_mrpips", name: "Gov.pl Ministerstwo Rodziny, Pracy i Polityki Społecznej", url: "https://www.gov.pl/web/rodzina", media: false, pagePrefix: "/web/rodzina/", ministryCode: "MRPiPS" },
+  { key: "govpl_mz", name: "Gov.pl Ministerstwo Zdrowia", url: "https://www.gov.pl/web/zdrowie", media: false, pagePrefix: "/web/zdrowie/", ministryCode: "MZ" },
+  { key: "govpl_men", name: "Gov.pl Ministerstwo Edukacji Narodowej", url: "https://www.gov.pl/web/edukacja", media: false, pagePrefix: "/web/edukacja/", ministryCode: "MEN" },
+  { key: "govpl_mnisw", name: "Gov.pl Ministerstwo Nauki i Szkolnictwa Wyższego", url: "https://www.gov.pl/web/nauka", media: false, pagePrefix: "/web/nauka/", ministryCode: "MNiSW" },
+  { key: "govpl_mi", name: "Gov.pl Ministerstwo Infrastruktury", url: "https://www.gov.pl/web/infrastruktura", media: false, pagePrefix: "/web/infrastruktura/", ministryCode: "MI" },
+  { key: "govpl_mrirw", name: "Gov.pl Ministerstwo Rolnictwa i Rozwoju Wsi", url: "https://www.gov.pl/web/rolnictwo", media: false, pagePrefix: "/web/rolnictwo/", ministryCode: "MRiRW" },
+  { key: "govpl_mc", name: "Gov.pl Ministerstwo Cyfryzacji", url: "https://www.gov.pl/web/cyfryzacja", media: false, pagePrefix: "/web/cyfryzacja/", ministryCode: "MC" },
+  { key: "govpl_mkidn", name: "Gov.pl Ministerstwo Kultury i Dziedzictwa Narodowego", url: "https://www.gov.pl/web/kultura", media: false, pagePrefix: "/web/kultura/", ministryCode: "MKiDN" },
+  { key: "govpl_msit", name: "Gov.pl Ministerstwo Sportu i Turystyki", url: "https://www.gov.pl/web/sport", media: false, pagePrefix: "/web/sport/", ministryCode: "MSiT" },
+  { key: "govpl_mp", name: "Gov.pl Ministerstwo Przemysłu", url: "https://www.gov.pl/web/przemysl", media: false, pagePrefix: "/web/przemysl/", ministryCode: "MP" },
   { key: "rmf24", name: "RMF24", url: "https://www.rmf24.pl/fakty/polska/feed", media: true },
   { key: "polsat_news", name: "Polsat News", url: "https://www.polsatnews.pl/rss/wszystkie.xml", media: true },
   { key: "rzeczpospolita", name: "Rzeczpospolita", url: "https://www.rp.pl/rss_main", media: true },
@@ -54,11 +54,19 @@ const governmentSignals = [
   "ue", "unia europejska", "bruksela", "donald tusk", "pełczyńska", "szyszko",
   "domanski", "domański", "kosiniak", "hołownia", "kierwiński", "sikorski",
 ];
+const nonGovernmentTopics = ["trzęsienie ziemi", "morze tyrreńskie", "sycylia", "wstrząsy sejsmiczne"];
 
 function isGovernmentRelevant(item: RecordItem, source: Source): boolean {
   if (!source.media) return true;
   const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
+  if (nonGovernmentTopics.some((topic) => haystack.includes(topic))) return false;
   return governmentSignals.some((signal) => haystack.includes(signal));
+}
+
+function isPrimeMinisterStatement(item: RecordItem, source: Source): boolean {
+  if (source.key !== "govpl_premier") return false;
+  const haystack = `${item.title} ${item.content}`.toLocaleLowerCase("pl-PL");
+  return ["donald tusk", "premier", "prezes rady ministrów", "konferencja premiera"].some((signal) => haystack.includes(signal));
 }
 
 function parseEvents(html: string, source: Source): Promise<ActivityItem[]> {
@@ -183,9 +191,34 @@ Deno.serve(async (request) => {
       const run = await supabase.from("ingestion_runs").insert({ source_key: source.key, status: "RUNNING", records_seen: records.length }).select("id").single();
       if (run.error) throw run.error;
       const table = source.media ? "media_coverage" : "official_statements";
+      const ministry = source.ministryCode
+        ? await supabase.from("ministries_and_bodies").select("id").eq("code", source.ministryCode).maybeSingle()
+        : { data: null, error: null };
+      if (ministry.error) throw ministry.error;
+      const premier = source.key === "govpl_premier"
+        ? await supabase.from("officials").select("id").eq("full_name", "Donald Tusk").eq("is_active", true).maybeSingle()
+        : { data: null, error: null };
+      if (premier.error) throw premier.error;
       const rows = source.media
         ? records.map((item) => ({ outlet_name: item.source_name, article_title: item.title, content: item.content, published_at: item.published_at || started, source_url: item.source_url, source_key: item.source_key, content_hash: item.content_hash, verified: true, fetched_at: started }))
-        : records.map((item) => ({ source_type: "GOV_PL", title: item.title, content: item.content, published_at: item.published_at || started, source_url: item.source_url, raw_metadata: { source_name: item.source_name }, source_key: item.source_key, content_hash: item.content_hash, verified: true, fetched_at: started }));
+        : records.map((item) => ({
+          official_id: isPrimeMinisterStatement(item, source) ? premier.data?.id ?? null : null,
+          ministry_id: ministry.data?.id ?? null,
+          source_type: "GOV_PL",
+          title: item.title,
+          content: item.content,
+          published_at: item.published_at || started,
+          source_url: item.source_url,
+          raw_metadata: {
+            source_name: item.source_name,
+            source_scope: source.key === "govpl_premier" ? "KPRM_PUBLIC_COMMUNICATION" : "MINISTRY_PUBLIC_COMMUNICATION",
+            attributed_to_prime_minister: isPrimeMinisterStatement(item, source),
+          },
+          source_key: item.source_key,
+          content_hash: item.content_hash,
+          verified: true,
+          fetched_at: started,
+        }));
       let count = 0;
       for (const row of rows) {
         const inserted = await supabase.from(table).insert(row);
@@ -225,6 +258,7 @@ Deno.serve(async (request) => {
           starts_at: event.starts_at,
           location: event.location || null,
           source_name: event.source_name,
+          ministry_id: ministry.data?.id ?? null,
           source_url: event.source_url,
           source_key: event.source_key,
           content_hash: event.content_hash,
